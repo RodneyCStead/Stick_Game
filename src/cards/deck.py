@@ -2,7 +2,7 @@
 Deck management
 """
 
-from cards.card import AttackCard, HealCard
+from cards.card import AttackCard, HealCard, UtilityCard, BuffCard
 import random
 
 class Deck:
@@ -12,20 +12,29 @@ class Deck:
         self.shuffle()
     
     def _create_starting_deck(self):
-        """Create the player's starting deck"""
-        # Basic attack cards
-        for _ in range(5):
+        """Create the player's starting deck with all card types"""
+        
+        # ATTACK CARDS
+        for _ in range(4):
             self.cards.append(AttackCard("Strike", 1, 6))
         
         for _ in range(2):
             self.cards.append(AttackCard("Heavy Strike", 2, 12))
         
-        # Utility cards
-        for _ in range(2):
-            self.cards.append(HealCard("Heal", 1, 8))
-        
-        # Special attack
         self.cards.append(AttackCard("Power Strike", 3, 18))
+        
+        # UTILITY CARDS
+        for _ in range(2):
+            self.cards.append(UtilityCard("Shield Block", 1, "Gain 6 armor", "shield", 6))
+        
+        for _ in range(2):
+            self.cards.append(UtilityCard("Healing Potion", 1, "Heal 8 health", "heal", 8))
+        
+        self.cards.append(UtilityCard("Iron Defense", 2, "Gain 12 armor", "shield", 12))
+        
+        # BUFF CARDS
+        self.cards.append(BuffCard("Rage", 2, "Deal +3 damage for 3 turns", "strength", 3, 3))
+        self.cards.append(BuffCard("Focus", 1, "Deal +2 damage for 2 turns", "strength", 2, 2))
     
     def shuffle(self):
         """Shuffle the deck"""

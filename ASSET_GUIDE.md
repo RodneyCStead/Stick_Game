@@ -22,8 +22,12 @@ Place in: `assets/sprites/cards/`
 **File Names Needed:**
 - `strike.png` - Basic attack
 - `heavy_strike.png` - Powerful attack
-- `heal.png` - Healing ability
 - `power_strike.png` - Ultimate attack
+- `shield_block.png` - Defensive utility
+- `healing_potion.png` - Healing utility
+- `iron_defense.png` - Strong defense
+- `rage.png` - Strength buff
+- `focus.png` - Minor strength buff
 
 **AI Prompts:**
 - "Stick figure punching, action pose, card game art, 120x160 pixels"

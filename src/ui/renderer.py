@@ -63,11 +63,11 @@ class Renderer:
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):
-        """Render a health bar for a character"""
+        """Render a health bar and armor for a character"""
         bar_width = 200
         bar_height = 20
         
-        # Background
+        # Health bar background
         bg_rect = pygame.Rect(x, y, bar_width, bar_height)
         pygame.draw.rect(self.screen, DARK_GRAY, bg_rect)
         
@@ -85,6 +85,21 @@ class Renderer:
         text_surface = self.font.render(health_text, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=(x + bar_width // 2, y + bar_height // 2))
         self.screen.blit(text_surface, text_rect)
+        
+        # Armor display (if any)
+        if hasattr(character, 'armor') and character.armor > 0:
+            armor_text = f"Armor: {character.armor}"
+            armor_surface = self.small_font.render(armor_text, True, (150, 150, 255))
+            self.screen.blit(armor_surface, (x, y + bar_height + 5))
+        
+        # Buffs display
+        if hasattr(character, 'buffs') and character.buffs:
+            buff_y = y + bar_height + 25
+            for buff_name, buff_data in character.buffs.items():
+                buff_text = f"{buff_name.title()}: +{buff_data['value']} ({buff_data['duration']} turns)"
+                buff_surface = self.small_font.render(buff_text, True, (255, 255, 150))
+                self.screen.blit(buff_surface, (x, buff_y))
+                buff_y += 15
     
     def _render_bottom_panel(self):
         """Render the bottom UI panel"""
@@ -107,7 +122,12 @@ class Renderer:
     
     def _render_card(self, card, x, y):
         """Render a single card with stick figure art"""
-        # Try to load card artwork, fallback to simple design
+        # Draw card background first
+        card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
+        pygame.draw.rect(self.screen, CARD_COLOR, card_rect)
+        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
+        
+        # Try to load card artwork (with transparent white background)
         card_image = image_loader.load_card(card.name, (CARD_WIDTH, CARD_HEIGHT))
         self.screen.blit(card_image, (x, y))
         

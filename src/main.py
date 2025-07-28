@@ -12,12 +12,12 @@ async def main():
     """Main game loop"""
     pygame.init()
     
-    # Set up the display
+    # Sets up the display
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Stick It To Em - Card Battle")
     clock = pygame.time.Clock()
     
-    # Initialize game engine
+    # Initializes the game engine
     game_engine = GameEngine(screen)
     
     # Main game loop
