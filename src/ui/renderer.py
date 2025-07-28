@@ -102,10 +102,17 @@ class Renderer:
                 buff_y += 15
     
     def _render_bottom_panel(self):
-        """Render the bottom UI panel"""
+        """Render the bottom UI panel with background image"""
         panel_rect = pygame.Rect(0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT, SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT)
-        pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect)
-        pygame.draw.rect(self.screen, PANEL_BORDER, panel_rect, 2)
+        
+        # Try to load background image, fallback to colored rectangle
+        try:
+            panel_background = image_loader.load_ui_element("bottom_Box", (SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT))
+            self.screen.blit(panel_background, (0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT))
+        except:
+            # Fallback to original colored panel
+            pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect)
+            pygame.draw.rect(self.screen, PANEL_BORDER, panel_rect, 2)
     
     def _render_hand(self, hand):
         """Render the player's hand of cards"""
@@ -122,14 +129,16 @@ class Renderer:
     
     def _render_card(self, card, x, y):
         """Render a single card with stick figure art"""
-        # Draw card background first
-        card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
-        pygame.draw.rect(self.screen, CARD_COLOR, card_rect)
-        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
-        
-        # Try to load card artwork (with transparent white background)
+        # Try to load card artwork first
         card_image = image_loader.load_card(card.name, (CARD_WIDTH, CARD_HEIGHT))
+        
+        # Check if we got a fallback (colored rectangle) or real image
+        # If it's a fallback, it will be a solid color
         self.screen.blit(card_image, (x, y))
+        
+        # Draw a border around the card
+        card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
+        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
         
         # Overlay card information on top of the artwork
         # Card cost (top-left corner)
