@@ -27,7 +27,9 @@ class AttackCard(Card):
     
     def use(self, caster, target=None):
         if target:
-            target.take_damage(self.damage)
+            # Calculate total damage including strength buffs
+            total_damage = self.damage + caster.get_buff_value("strength")
+            target.take_damage(total_damage)
 
 
 class HealCard(Card):
@@ -42,10 +44,35 @@ class HealCard(Card):
         caster.heal(self.heal_amount)
 
 
-class BuffCard(Card):
-    def __init__(self, name, cost, description):
-        super().__init__(name, cost, description, "Buff")
+class UtilityCard(Card):
+    def __init__(self, name, cost, description, effect_type, effect_value):
+        super().__init__(name, cost, description, "Utility")
+        self.effect_type = effect_type  # "shield", "heal", etc.
+        self.effect_value = effect_value
     
     def use(self, caster, target=None):
-        # Placeholder for buff effects
-        pass
+        if self.effect_type == "shield":
+            # Add armor/shield to caster
+            if not hasattr(caster, 'armor'):
+                caster.armor = 0
+            caster.armor += self.effect_value
+        elif self.effect_type == "heal":
+            # Heal the caster
+            caster.heal(self.effect_value)
+
+
+class BuffCard(Card):
+    def __init__(self, name, cost, description, buff_type, buff_value, duration=3):
+        super().__init__(name, cost, description, "Buff")
+        self.buff_type = buff_type  # "strength", "speed", etc.
+        self.buff_value = buff_value
+        self.duration = duration
+    
+    def use(self, caster, target=None):
+        # Add temporary buff to caster
+        if not hasattr(caster, 'buffs'):
+            caster.buffs = {}
+        caster.buffs[self.buff_type] = {
+            'value': self.buff_value,
+            'duration': self.duration
+        }

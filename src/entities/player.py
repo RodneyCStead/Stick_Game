@@ -52,6 +52,9 @@ class Player(Character):
     
     def start_turn(self):
         """Actions at start of player turn"""
+        # Update buffs (reduce duration)
+        self.update_buffs()
+        
         # Restore mana
         self.mana = self.max_mana
         
