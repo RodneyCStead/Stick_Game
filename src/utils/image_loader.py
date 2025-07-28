@@ -11,7 +11,7 @@ class ImageLoader:
         self.image_cache = {}
         self.base_path = "assets/sprites"
     
-    def load_image(self, image_path, size=None, fallback_color=(255, 255, 255)):
+    def load_image(self, image_path, size=None, fallback_color=(255, 255, 255), make_transparent=False, transparent_color=(255, 255, 255)):
         """
         Load an image with caching and fallback
         
@@ -19,12 +19,14 @@ class ImageLoader:
             image_path: Path relative to assets/sprites/
             size: Tuple (width, height) to scale the image
             fallback_color: Color to use if image not found
+            make_transparent: Whether to make a specific color transparent
+            transparent_color: Color to make transparent (default: white)
         
         Returns:
             pygame.Surface: The loaded (and optionally scaled) image
         """
         # Create cache key
-        cache_key = f"{image_path}_{size}"
+        cache_key = f"{image_path}_{size}_{make_transparent}"
         
         # Return cached image if available
         if cache_key in self.image_cache:
@@ -35,6 +37,13 @@ class ImageLoader:
         try:
             # Try to load the image
             image = pygame.image.load(full_path)
+            
+            # Convert to a format that supports transparency
+            if make_transparent:
+                image = image.convert()
+                image.set_colorkey(transparent_color)  # Make white transparent
+            else:
+                image = image.convert_alpha()
             
             # Scale if size provided
             if size:
@@ -63,11 +72,12 @@ class ImageLoader:
         return self.load_image(image_path, size)
     
     def load_card(self, card_name, size=(120, 160)):
-        """Load a card image"""
+        """Load a card image with white background made transparent"""
         # Convert card name to filename (remove spaces, lowercase)
         filename = card_name.lower().replace(" ", "_").replace("'", "")
         image_path = f"cards/{filename}.png"
-        return self.load_image(image_path, size)
+        # Make white background transparent for cards
+        return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
     
     def load_ui_element(self, element_name, size=None):
         """Load a UI element"""
