@@ -132,8 +132,7 @@ class Renderer:
         # Try to load card artwork first
         card_image = image_loader.load_card(card.name, (CARD_WIDTH, CARD_HEIGHT))
         
-        # Check if we got a fallback (colored rectangle) or real image
-        # If it's a fallback, it will be a solid color
+        # Blit the card image
         self.screen.blit(card_image, (x, y))
         
         # Draw a border around the card
@@ -150,16 +149,6 @@ class Renderer:
         cost_text = self.font.render(str(card.cost), True, WHITE)
         cost_rect = cost_text.get_rect(center=(x + 17, y + 17))
         self.screen.blit(cost_text, cost_rect)
-        
-        # Card name at bottom
-        name_bg = pygame.Surface((CARD_WIDTH - 10, 25))
-        name_bg.fill(BLACK)
-        name_bg.set_alpha(180)
-        self.screen.blit(name_bg, (x + 5, y + CARD_HEIGHT - 30))
-        
-        name_text = self.small_font.render(card.name, True, WHITE)
-        name_rect = name_text.get_rect(center=(x + CARD_WIDTH // 2, y + CARD_HEIGHT - 17))
-        self.screen.blit(name_text, name_rect)
     
     def _render_wrapped_text(self, text, x, y, width, color):
         """Render text with word wrapping"""

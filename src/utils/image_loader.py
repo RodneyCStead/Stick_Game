@@ -37,7 +37,6 @@ class ImageLoader:
         try:
             # Try to load the image
             image = pygame.image.load(full_path)
-            print(f"Successfully loaded: {full_path}")  # Debug output
             
             # Convert to a format that supports transparency
             if make_transparent:
@@ -55,7 +54,6 @@ class ImageLoader:
             return image
             
         except (pygame.error, FileNotFoundError) as e:
-            print(f"Failed to load: {full_path} - Error: {e}")  # Debug output
             # Create fallback rectangle if image not found
             if size:
                 fallback = pygame.Surface(size)
@@ -84,7 +82,7 @@ class ImageLoader:
         }
         
         # Cards that should NOT have white transparency (like shields with white elements)
-        no_transparency_cards = ["shield"]
+        no_transparency_cards = ["shield", "healing"]  # JPGs and cards with white design elements
         
         # Get the correct filename
         card_key = card_name.lower()
@@ -98,12 +96,12 @@ class ImageLoader:
         
         # Check if this card should have transparency or not
         if card_key in no_transparency_cards:
-            # Don't make white transparent for shield cards
+            # Don't make white transparent for shield/healing cards
             return self.load_image(image_path, size, make_transparent=False)
         else:
-            # TEMPORARILY DISABLE transparency for ALL cards to debug white-out issue
+            # Temporarily disable transparency for ALL cards while you work on images
             return self.load_image(image_path, size, make_transparent=False)
-            # Original line: return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
+            # When you're ready for transparency: return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
     
     def load_ui_element(self, element_name, size=None):
         """Load a UI element - tries multiple file extensions, NO transparency"""
@@ -114,10 +112,11 @@ class ImageLoader:
             try:
                 image_path = f"ui/{element_name.lower()}{ext}"
                 full_path = os.path.join(self.base_path, image_path)
+                
                 if os.path.exists(full_path):
                     # Load WITHOUT transparency for UI elements
                     return self.load_image(image_path, size, make_transparent=False)
-            except:
+            except Exception as e:
                 continue
         
         # If no file found, create fallback
