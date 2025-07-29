@@ -105,9 +105,9 @@ class Renderer:
         """Render the bottom UI panel with background image"""
         panel_rect = pygame.Rect(0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT, SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT)
         
-        # Try to load background image, fallback to colored rectangle
+        # Load PNG background image, fallback to colored rectangle
         try:
-            panel_background = image_loader.load_ui_element("bottom_Box", (SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT))
+            panel_background = image_loader.load_image("ui/bottom_Box.png", (SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT))
             self.screen.blit(panel_background, (0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT))
         except:
             # Fallback to original colored panel
