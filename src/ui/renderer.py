@@ -102,10 +102,17 @@ class Renderer:
                 buff_y += 15
     
     def _render_bottom_panel(self):
-        """Render the bottom UI panel"""
+        """Render the bottom UI panel with background image"""
         panel_rect = pygame.Rect(0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT, SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT)
-        pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect)
-        pygame.draw.rect(self.screen, PANEL_BORDER, panel_rect, 2)
+        
+        # Load PNG background image, fallback to colored rectangle
+        try:
+            panel_background = image_loader.load_image("ui/bottom_Box.png", (SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT))
+            self.screen.blit(panel_background, (0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT))
+        except:
+            # Fallback to original colored panel
+            pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect)
+            pygame.draw.rect(self.screen, PANEL_BORDER, panel_rect, 2)
     
     def _render_hand(self, hand):
         """Render the player's hand of cards"""
@@ -122,14 +129,15 @@ class Renderer:
     
     def _render_card(self, card, x, y):
         """Render a single card with stick figure art"""
-        # Draw card background first
-        card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
-        pygame.draw.rect(self.screen, CARD_COLOR, card_rect)
-        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
-        
-        # Try to load card artwork (with transparent white background)
+        # Try to load card artwork first
         card_image = image_loader.load_card(card.name, (CARD_WIDTH, CARD_HEIGHT))
+        
+        # Blit the card image
         self.screen.blit(card_image, (x, y))
+        
+        # Draw a border around the card
+        card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
+        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
         
         # Overlay card information on top of the artwork
         # Card cost (top-left corner)
@@ -141,16 +149,6 @@ class Renderer:
         cost_text = self.font.render(str(card.cost), True, WHITE)
         cost_rect = cost_text.get_rect(center=(x + 17, y + 17))
         self.screen.blit(cost_text, cost_rect)
-        
-        # Card name at bottom
-        name_bg = pygame.Surface((CARD_WIDTH - 10, 25))
-        name_bg.fill(BLACK)
-        name_bg.set_alpha(180)
-        self.screen.blit(name_bg, (x + 5, y + CARD_HEIGHT - 30))
-        
-        name_text = self.small_font.render(card.name, True, WHITE)
-        name_rect = name_text.get_rect(center=(x + CARD_WIDTH // 2, y + CARD_HEIGHT - 17))
-        self.screen.blit(name_text, name_rect)
     
     def _render_wrapped_text(self, text, x, y, width, color):
         """Render text with word wrapping"""

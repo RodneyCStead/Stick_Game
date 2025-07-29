@@ -20,20 +20,16 @@ Place in: `assets/sprites/characters/`
 Place in: `assets/sprites/cards/`
 
 **File Names Needed:**
-- `strike.png` - Basic attack
-- `heavy_strike.png` - Powerful attack
-- `power_strike.png` - Ultimate attack
-- `shield_block.png` - Defensive utility
-- `healing_potion.png` - Healing utility
-- `iron_defense.png` - Strong defense
-- `rage.png` - Strength buff
-- `focus.png` - Minor strength buff
+- `slash.png` - Sword attack (8 damage)
+- `kick.png` - Physical attack (6 damage)
+- `healing_potion.png` - Healing utility (10 health)
+- `shields_up.png` - Defense enhancement (8 armor)
 
 **AI Prompts:**
-- "Stick figure punching, action pose, card game art, 120x160 pixels"
-- "Stick figure with weapon raised, heavy attack, simple black lines"
-- "Stick figure with green healing aura, hearts around character"
-- "Stick figure with energy effect, power attack, dramatic pose"
+- "Stick figure swinging sword, slash attack, card game art, 120x160 pixels, simple black lines"
+- "Stick figure kicking, martial arts pose, action card art, white background"
+- "Stick figure drinking potion, green healing aura, hearts around character"
+- "Stick figure with shield raised, defensive pose, protection effect"
 
 ### **Platform/Background** (1000x200 pixels recommended)
 Place in: `assets/sprites/platform/`

@@ -12,29 +12,22 @@ class Deck:
         self.shuffle()
     
     def _create_starting_deck(self):
-        """Create the player's starting deck with all card types"""
+        """Create the player's starting deck with 4 card types"""
         
-        # ATTACK CARDS
-        for _ in range(4):
-            self.cards.append(AttackCard("Strike", 1, 6))
+        # ATTACK CARDS (2 types)
+        for _ in range(3):
+            self.cards.append(AttackCard("Slash", 1, 8))
         
-        for _ in range(2):
-            self.cards.append(AttackCard("Heavy Strike", 2, 12))
+        for _ in range(3):
+            self.cards.append(AttackCard("Kick", 1, 6))
         
-        self.cards.append(AttackCard("Power Strike", 3, 18))
+        # UTILITY CARD (1 type)
+        for _ in range(3):
+            self.cards.append(UtilityCard("Healing", 1, "Heal 10 health", "heal", 10))
         
-        # UTILITY CARDS
-        for _ in range(2):
-            self.cards.append(UtilityCard("Shield Block", 1, "Gain 6 armor", "shield", 6))
-        
-        for _ in range(2):
-            self.cards.append(UtilityCard("Healing Potion", 1, "Heal 8 health", "heal", 8))
-        
-        self.cards.append(UtilityCard("Iron Defense", 2, "Gain 12 armor", "shield", 12))
-        
-        # BUFF CARDS
-        self.cards.append(BuffCard("Rage", 2, "Deal +3 damage for 3 turns", "strength", 3, 3))
-        self.cards.append(BuffCard("Focus", 1, "Deal +2 damage for 2 turns", "strength", 2, 2))
+        # ENHANCEMENT CARD (1 type)
+        for _ in range(3):
+            self.cards.append(UtilityCard("Shield", 2, "Gain 8 armor", "shield", 8))
     
     def shuffle(self):
         """Shuffle the deck"""
