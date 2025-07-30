@@ -47,7 +47,19 @@ class HealCard(Card):
 class UtilityCard(Card):
     def __init__(self, name, cost, description, effect_type, effect_value):
         super().__init__(name, cost, description, "Utility")
-        self.effect_type = effect_type  # "shield", "heal", etc.
+        self.effect_type = effect_type  # "heal", etc.
+        self.effect_value = effect_value
+    
+    def use(self, caster, target=None):
+        if self.effect_type == "heal":
+            # Heal the caster
+            caster.heal(self.effect_value)
+
+
+class EnhancementCard(Card):
+    def __init__(self, name, cost, description, effect_type, effect_value):
+        super().__init__(name, cost, description, "Enhancement")
+        self.effect_type = effect_type  # "shield", etc.
         self.effect_value = effect_value
     
     def use(self, caster, target=None):
@@ -56,23 +68,3 @@ class UtilityCard(Card):
             if not hasattr(caster, 'armor'):
                 caster.armor = 0
             caster.armor += self.effect_value
-        elif self.effect_type == "heal":
-            # Heal the caster
-            caster.heal(self.effect_value)
-
-
-class BuffCard(Card):
-    def __init__(self, name, cost, description, buff_type, buff_value, duration=3):
-        super().__init__(name, cost, description, "Buff")
-        self.buff_type = buff_type  # "strength", "speed", etc.
-        self.buff_value = buff_value
-        self.duration = duration
-    
-    def use(self, caster, target=None):
-        # Add temporary buff to caster
-        if not hasattr(caster, 'buffs'):
-            caster.buffs = {}
-        caster.buffs[self.buff_type] = {
-            'value': self.buff_value,
-            'duration': self.duration
-        }

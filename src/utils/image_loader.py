@@ -77,8 +77,8 @@ class ImageLoader:
         card_file_mapping = {
             "slash": "slash_Attack.png",
             "kick": "kick_Attack.png",
-            "healing": "healing_Utility.jpg",
-            "shield": "shield_Enhancement.jpg"
+            "healing": "healing_Utility.png",
+            "shield": "shield_Enhancement.png"
         }
         
         # Cards that should NOT have white transparency (like shields with white elements)

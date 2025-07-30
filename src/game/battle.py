@@ -77,7 +77,10 @@ class BattleState:
             # Play the card
             if self.player.can_play_card(card):
                 self.player.play_card(card, self.enemy)
-                self.turn_manager.end_player_turn()
+                
+                # Check if player has spent all AP or can't afford any more cards
+                if not self.player.has_action_points() or not self.player.can_afford_any_card():
+                    self.turn_manager.end_player_turn()
     
     def get_current_turn(self):
         """Get whose turn it is"""
