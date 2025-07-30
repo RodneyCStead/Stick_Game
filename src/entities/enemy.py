@@ -7,17 +7,16 @@ from utils.constants import ENEMY_X, CHARACTER_Y
 import random
 
 class Enemy(Character):
-    def __init__(self, enemy_type="Slime"):
-        # Enemy stats based on type - focused on slimes for now
+    def __init__(self, enemy_type="Green Slime"):
+        # Enemy stats based on type - focused on Green Slime only
         enemy_stats = {
-            
             "Green Slime": {
                 "health": 60,
                 "flavor_text": "Don't be fooled by this creature, it WILL Glorp you up."
             }
         }
         
-        stats = enemy_stats.get(enemy_type, enemy_stats["Slime"])
+        stats = enemy_stats.get(enemy_type, enemy_stats["Green Slime"])
         super().__init__(enemy_type, stats["health"], ENEMY_X, CHARACTER_Y)
         
         self.enemy_type = enemy_type

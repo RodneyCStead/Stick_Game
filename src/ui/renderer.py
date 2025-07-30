@@ -40,7 +40,7 @@ class Renderer:
         self._render_end_turn_button()
         
         # Render player's hand
-        self._render_hand(battle_state.player.hand)
+        self._render_hand(battle_state.player.hand, battle_state)
         
         # Render player's action points
         self._render_action_points(battle_state.player)
@@ -190,7 +190,7 @@ class Renderer:
             pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect)
             pygame.draw.rect(self.screen, PANEL_BORDER, panel_rect, 2)
     
-    def _render_hand(self, hand):
+    def _render_hand(self, hand, battle_state):
         """Render the player's hand of cards"""
         if not hand:
             return
@@ -201,9 +201,10 @@ class Renderer:
         
         for i, card in enumerate(hand):
             card_x = start_x + i * (CARD_WIDTH + CARD_SPACING)
-            self._render_card(card, card_x, HAND_Y)
+            is_selected = (battle_state.selected_card_index == i)
+            self._render_card(card, card_x, HAND_Y, is_selected)
     
-    def _render_card(self, card, x, y):
+    def _render_card(self, card, x, y, is_selected=False):
         """Render a single card with stick figure art"""
         # Try to load card artwork first
         card_image = image_loader.load_card(card.name, (CARD_WIDTH, CARD_HEIGHT))
@@ -213,7 +214,13 @@ class Renderer:
         
         # Draw a border around the card
         card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
-        pygame.draw.rect(self.screen, BLACK, card_rect, 2)
+        
+        if is_selected:
+            # Highlight selected card with thicker, colored border
+            pygame.draw.rect(self.screen, (255, 255, 0), card_rect, 4)  # Yellow border
+        else:
+            # Normal black border
+            pygame.draw.rect(self.screen, BLACK, card_rect, 2)
         
     
     def _render_action_points(self, player):
