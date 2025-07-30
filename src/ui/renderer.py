@@ -16,7 +16,10 @@ class Renderer:
     
     def render_battle(self, battle_state):
         """Render the entire battle scene"""
-        # Render platform
+        # Render background (first layer)
+        self._render_background()
+        
+        # Render platform (middle layer)
         self._render_platform()
         
         # Render characters
@@ -33,6 +36,12 @@ class Renderer:
         # Render player's hand
         self._render_hand(battle_state.player.hand)
         
+        # Render player's action points
+        self._render_action_points(battle_state.player)
+        
+        # Render deck counter
+        self._render_deck_counter(battle_state.player)
+        
         # Render turn indicator
         self._render_turn_indicator(battle_state.get_current_turn())
         
@@ -43,11 +52,19 @@ class Renderer:
         if battle_state.battle_over:
             self._render_battle_end(battle_state.winner)
     
+    # Helper methods for rendering various components
+    def _render_background(self):
+        """Render the background from top of screen to where platform starts"""
+        background_image = image_loader.load_background("background_Box.png", (BACKGROUND_WIDTH, BACKGROUND_HEIGHT), make_transparent=False)
+        background_rect = pygame.Rect(BACKGROUND_X, BACKGROUND_Y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        self.screen.blit(background_image, background_rect)
+    
     def _render_platform(self):
         """Render the battle platform"""
-        # Try to load platform image, fallback to colored rectangle
-        platform_image = image_loader.load_platform("battlefield", (SCREEN_WIDTH - 200, PLATFORM_HEIGHT))
-        platform_rect = pygame.Rect(100, PLATFORM_Y, SCREEN_WIDTH - 200, PLATFORM_HEIGHT)
+        platform_image = image_loader.load_image("platform/platform_Box.png", (PLATFORM_WIDTH, PLATFORM_HEIGHT), make_transparent=True, transparent_color=(255, 255, 255))
+        # Center the platform on screen
+        platform_x = (SCREEN_WIDTH - PLATFORM_WIDTH) // 2
+        platform_rect = pygame.Rect(platform_x, PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
         self.screen.blit(platform_image, platform_rect)
     
     def _render_character(self, character, color):
@@ -139,16 +156,36 @@ class Renderer:
         card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
         pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
         
-        # Overlay card information on top of the artwork
-        # Card cost (top-left corner)
-        cost_bg = pygame.Surface((25, 25))
-        cost_bg.fill(MANA_COLOR)
-        cost_bg.set_alpha(200)
-        self.screen.blit(cost_bg, (x + 5, y + 5))
+    
+    def _render_action_points(self, player):
+        """Render the player's action points"""
+        ap_text = f"AP: {player.action_points}/{player.max_action_points}"
+        ap_font = pygame.font.Font(None,36)
+        text_surface = self.font.render(ap_text, True, AP_COLOR)
         
-        cost_text = self.font.render(str(card.cost), True, WHITE)
-        cost_rect = cost_text.get_rect(center=(x + 17, y + 17))
-        self.screen.blit(cost_text, cost_rect)
+        # Position in bottom-left of screen
+        ap_x = 200
+        ap_y = SCREEN_HEIGHT - 230
+        self.screen.blit(text_surface, (ap_x, ap_y))
+    
+    def _render_deck_counter(self, player):
+        """Render the deck card counter"""
+        deck_count = player.deck.cards_remaining()
+        discard_count = len(player.discard_pile)
+        
+        deck_text = f"Deck: {deck_count}"
+        discard_text = f"Discard: {discard_count}"
+        
+        # Position in bottom-right area
+        deck_surface = self.font.render(deck_text, True, WHITE)
+        discard_surface = self.small_font.render(discard_text, True, GRAY)
+        
+        deck_x = SCREEN_WIDTH - 120
+        deck_y = SCREEN_HEIGHT - 50
+        discard_y = SCREEN_HEIGHT - 30
+        
+        self.screen.blit(deck_surface, (deck_x, deck_y))
+        self.screen.blit(discard_surface, (deck_x, discard_y))
     
     def _render_wrapped_text(self, text, x, y, width, color):
         """Render text with word wrapping"""

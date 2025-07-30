@@ -77,8 +77,8 @@ class ImageLoader:
         card_file_mapping = {
             "slash": "slash_Attack.png",
             "kick": "kick_Attack.png",
-            "healing": "healing_Utility.jpg",
-            "shield": "shield_Enhancement.jpg"
+            "healing": "healing_Utility.png",
+            "shield": "shield_Enhancement.png"
         }
         
         # Cards that should NOT have white transparency (like shields with white elements)
@@ -131,6 +131,51 @@ class ImageLoader:
         """Load platform/background image"""
         image_path = f"platform/{platform_name.lower()}.png"
         return self.load_image(image_path, size)
+
+    def load_background(self, background_name, size=None, make_transparent=False, transparent_color=(255, 255, 255)):
+        """Load background image from assets/backgrounds/ folder"""
+        # Create cache key
+        cache_key = f"bg_{background_name}_{size}_{make_transparent}"
+        
+        # Return cached image if available
+        if cache_key in self.image_cache:
+            return self.image_cache[cache_key]
+        
+        # Use different base path for backgrounds
+        full_path = os.path.join("assets", "backgrounds", background_name)
+        
+        try:
+            # Try to load the image
+            image = pygame.image.load(full_path)
+            
+            # Convert to a format that supports transparency
+            if make_transparent:
+                image = image.convert()
+                image.set_colorkey(transparent_color)
+            else:
+                image = image.convert_alpha()
+            
+            # Scale if size provided
+            if size:
+                image = pygame.transform.scale(image, size)
+            
+            # Cache and return
+            self.image_cache[cache_key] = image
+            return image
+            
+        except (pygame.error, FileNotFoundError) as e:
+            print(f"Could not load background: {full_path} - {e}")
+            # Create fallback rectangle if image not found
+            if size:
+                fallback = pygame.Surface(size)
+            else:
+                fallback = pygame.Surface((1200, 400))  # Default background size
+            
+            fallback.fill((135, 206, 235))  # Sky blue fallback
+            
+            # Cache the fallback
+            self.image_cache[cache_key] = fallback
+            return fallback
 
 # Global image loader instance
 image_loader = ImageLoader()
