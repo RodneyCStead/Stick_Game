@@ -16,7 +16,10 @@ class Renderer:
     
     def render_battle(self, battle_state):
         """Render the entire battle scene"""
-        # Render platform
+        # Render background (first layer)
+        self._render_background()
+        
+        # Render platform (middle layer)
         self._render_platform()
         
         # Render characters
@@ -50,6 +53,12 @@ class Renderer:
             self._render_battle_end(battle_state.winner)
     
     # Helper methods for rendering various components
+    def _render_background(self):
+        """Render the background from top of screen to where platform starts"""
+        background_image = image_loader.load_background("background_Box.png", (BACKGROUND_WIDTH, BACKGROUND_HEIGHT), make_transparent=False)
+        background_rect = pygame.Rect(BACKGROUND_X, BACKGROUND_Y, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        self.screen.blit(background_image, background_rect)
+    
     def _render_platform(self):
         """Render the battle platform"""
         platform_image = image_loader.load_image("platform/platform_Box.png", (PLATFORM_WIDTH, PLATFORM_HEIGHT), make_transparent=True, transparent_color=(255, 255, 255))
