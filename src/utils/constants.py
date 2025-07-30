@@ -9,16 +9,22 @@ SCREEN_HEIGHT = 800
 FPS = 30
 
 # Game layout
-PLATFORM_WIDTH = 1216  # Platform width (can be wider than screen)
+PLATFORM_WIDTH = 1216  
 PLATFORM_HEIGHT = 240
 PLATFORM_Y = SCREEN_HEIGHT - PLATFORM_HEIGHT - 200  
 BOTTOM_PANEL_HEIGHT = 250  
 
 # Background layout
-BACKGROUND_WIDTH = SCREEN_WIDTH  # Full screen width
-BACKGROUND_HEIGHT = PLATFORM_Y  # From top to where platform starts
+BACKGROUND_WIDTH = SCREEN_WIDTH  
+BACKGROUND_HEIGHT = PLATFORM_Y  
 BACKGROUND_X = 0
 BACKGROUND_Y = 0  
+
+#Discard pile position
+DISCARD_X = 160
+DISCARD_Y = SCREEN_HEIGHT - 160 - 20  # 20 pixels from bottom
+DISCARD_WIDTH = 120
+DISCARD_HEIGHT = 160
 
 # Deck position
 DECK_X = 20
@@ -27,8 +33,8 @@ DECK_WIDTH = 120
 DECK_HEIGHT = 160
 
 # Character positions
-PLAYER_X = 200
-ENEMY_X = SCREEN_WIDTH - 200
+PLAYER_X = 400
+ENEMY_X = SCREEN_WIDTH - 400
 CHARACTER_Y = PLATFORM_Y - 100
 
 # Card display

@@ -36,6 +36,9 @@ class Renderer:
         # Render deck image
         self._render_deck_image()
         
+        # Render discard image
+        self._render_discard_image()
+        
         # Render player's hand
         self._render_hand(battle_state.player.hand)
         
@@ -72,14 +75,16 @@ class Renderer:
     
     def _render_character(self, character, color):
         """Render a stick figure character"""
-        # Try to load character sprite, fallback to colored rectangle
-        character_image = image_loader.load_character(character.name, (60, 120))
+        # Try to load character sprite with idle animation state, fallback to colored rectangle
+        # Adjust size here - make characters bigger/smaller as needed
+        character_size = (80, 160)  # Width, Height - adjust these values!
+        character_image = image_loader.load_character(character.name, character_size, state="idle")
         char_rect = character_image.get_rect(center=(character.x, character.y))
         self.screen.blit(character_image, char_rect)
         
         # Render character name
         name_text = self.font.render(character.name, True, TEXT_COLOR)
-        name_rect = name_text.get_rect(center=(character.x, character.y - 80))
+        name_rect = name_text.get_rect(center=(character.x, character.y - 100))  # Adjusted for bigger character
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):
@@ -127,9 +132,18 @@ class Renderer:
         deck_rect = pygame.Rect(DECK_X, DECK_Y, DECK_WIDTH, DECK_HEIGHT)
         self.screen.blit(deck_image, deck_rect)
         
-        # Draw black border around deck image
+        # Draws a black border around deck image
         pygame.draw.rect(self.screen, BLACK, deck_rect, 2)
-    
+        
+    def _render_discard_image (self):
+        """Render the discard pile representation image in bottom left corner"""
+        discard_image = image_loader.load_image("cards/discard_Pile.png", (DISCARD_WIDTH, DISCARD_HEIGHT), make_transparent=False)
+        discard_rect = pygame.Rect(DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT)
+        self.screen.blit(discard_image, discard_rect)
+
+        # Draws a black border around discard image
+        pygame.draw.rect(self.screen, BLACK, discard_rect, 2)
+
     def _render_bottom_panel(self):
         """Render the bottom UI panel with background image"""
         panel_rect = pygame.Rect(0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT, SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT)
