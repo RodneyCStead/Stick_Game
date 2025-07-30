@@ -11,7 +11,7 @@ class BattleState:
     def __init__(self):
         # Initialize player and enemy
         self.player = Player()
-        self.enemy = Enemy("Goblin")
+        self.enemy = Enemy("Slime")
         
         # Turn management
         self.turn_manager = TurnManager(self.player, self.enemy)
@@ -28,10 +28,15 @@ class BattleState:
         if input_handler.is_mouse_clicked():
             mouse_x, mouse_y = input_handler.get_mouse_pos()
             
+            # Check if clicked on END TURN button
+            if self._is_end_turn_button_clicked(mouse_x, mouse_y) and self.turn_manager.is_player_turn():
+                self._end_player_turn()
+            
             # Check if clicked on a card
-            card_index = self._get_clicked_card(mouse_x, mouse_y)
-            if card_index is not None and self.turn_manager.is_player_turn():
-                self._select_card(card_index)
+            else:
+                card_index = self._get_clicked_card(mouse_x, mouse_y)
+                if card_index is not None and self.turn_manager.is_player_turn():
+                    self._select_card(card_index)
     
     def update(self):
         """Update battle logic"""
@@ -81,6 +86,21 @@ class BattleState:
                 # Check if player has spent all AP or can't afford any more cards
                 if not self.player.has_action_points() or not self.player.can_afford_any_card():
                     self.turn_manager.end_player_turn()
+    
+    def _is_end_turn_button_clicked(self, mouse_x, mouse_y):
+        """Check if the END TURN button was clicked"""
+        from utils.constants import DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT
+        
+        # Check if click is within the END TURN button area
+        if (DISCARD_X <= mouse_x <= DISCARD_X + DISCARD_WIDTH and 
+            DISCARD_Y <= mouse_y <= DISCARD_Y + DISCARD_HEIGHT):
+            return True
+        return False
+    
+    def _end_player_turn(self):
+        """End the player's turn and switch to enemy"""
+        print("Player ended turn manually")  # Debug message
+        self.turn_manager.end_player_turn()
     
     def get_current_turn(self):
         """Get whose turn it is"""

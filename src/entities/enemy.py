@@ -7,29 +7,90 @@ from utils.constants import ENEMY_X, CHARACTER_Y
 import random
 
 class Enemy(Character):
-    def __init__(self, enemy_type="Goblin"):
-        # Enemy stats based on type
+    def __init__(self, enemy_type="Slime"):
+        # Enemy stats based on type - focused on slimes for now
         enemy_stats = {
-            "Goblin": {"health": 60, "damage": 8},
-            "Orc": {"health": 80, "damage": 12},
-            "Troll": {"health": 120, "damage": 15}
+            
+            "Green Slime": {
+                "health": 60,
+                "flavor_text": "Don't be fooled by this creature, it WILL Glorp you up."
+            }
         }
         
-        stats = enemy_stats.get(enemy_type, enemy_stats["Goblin"])
+        stats = enemy_stats.get(enemy_type, enemy_stats["Slime"])
         super().__init__(enemy_type, stats["health"], ENEMY_X, CHARACTER_Y)
         
-        self.damage = stats["damage"]
         self.enemy_type = enemy_type
+        self.flavor_text = stats["flavor_text"]
+        self.cards = []  # Enemy's available cards
+        self._initialize_cards()
+    
+    def _initialize_cards(self):
+        """Initialize the enemy's unique card set based on their type"""
+        # Import here to avoid circular imports
+        from cards.card import AttackCard, UtilityCard
+        
+        if self.enemy_type == "Green Slime":
+            
+            self.cards = [
+                AttackCard("Glorp", 0, 8, "Powerful acid attack", "This is what I ment by glorp you up.")
+            ]
+        
     
     def take_turn(self, target):
-        """Enemy AI - simple attack for now"""
-        if self.is_alive:
-            # Simple AI: always attack
-            damage = random.randint(self.damage - 2, self.damage + 2)
-            target.take_damage(damage)
-            return f"{self.name} attacks for {damage} damage!"
+        """Enemy AI - choose and use a card"""
+        if self.is_alive and self.cards:
+            # Simple AI: randomly choose a card to use
+            import random
+            chosen_card = random.choice(self.cards)
+            
+            # Use the card
+            if chosen_card.card_type == "Attack":
+                chosen_card.use(self, target)
+                return f"{self.name} uses {chosen_card.name} for {chosen_card.damage} damage!"
+            elif chosen_card.card_type in ["Utility", "Enhancement"]:
+                chosen_card.use(self, self)  # Target self for utility/enhancement cards
+                if chosen_card.effect_type == "heal":
+                    return f"{self.name} uses {chosen_card.name} and heals for {chosen_card.effect_value}!"
+                elif chosen_card.effect_type == "shield":
+                    return f"{self.name} uses {chosen_card.name} and gains {chosen_card.effect_value} armor!"
+            
+            return f"{self.name} uses {chosen_card.name}!"
         return ""
     
     def get_intent(self):
         """Get what the enemy plans to do (for UI)"""
-        return f"Attack ({self.damage})"
+        if self.cards:
+            # For now, show a general intent. Later this could be more sophisticated
+            # to show the actual card they'll use next
+            attack_cards = [card for card in self.cards if card.card_type == "Attack"]
+            if attack_cards:
+                avg_damage = sum(card.damage for card in attack_cards) // len(attack_cards)
+                return f"Planning Attack (~{avg_damage})"
+            else:
+                return "Planning Action"
+        return "Thinking..."
+    
+    def get_card_info(self, card_name):
+        """Get detailed information about a specific card"""
+        for card in self.cards:
+            if card.name == card_name:
+                return {
+                    'name': card.name,
+                    'description': card.description,
+                    'flavor_text': card.flavor_text,
+                    'type': card.card_type
+                }
+        return None
+    
+    def list_all_cards(self):
+        """List all cards with their flavor text - useful for debugging/testing"""
+        card_info = []
+        for card in self.cards:
+            card_info.append({
+                'name': card.name,
+                'description': card.description,
+                'flavor_text': card.flavor_text,
+                'type': card.card_type
+            })
+        return card_info

@@ -36,8 +36,8 @@ class Renderer:
         # Render deck image
         self._render_deck_image()
         
-        # Render discard image
-        self._render_discard_image()
+        # Render end turn button
+        self._render_end_turn_button()
         
         # Render player's hand
         self._render_hand(battle_state.player.hand)
@@ -68,7 +68,8 @@ class Renderer:
     def _render_platform(self):
         """Render the battle platform"""
         platform_image = image_loader.load_image("platform/platform_Box.png", (PLATFORM_WIDTH, PLATFORM_HEIGHT), make_transparent=True, transparent_color=(255, 255, 255))
-        # Center the platform on screen
+        
+        # Centers the platform on screen
         platform_x = (SCREEN_WIDTH - PLATFORM_WIDTH) // 2
         platform_rect = pygame.Rect(platform_x, PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
         self.screen.blit(platform_image, platform_rect)
@@ -147,14 +148,34 @@ class Renderer:
         # Draws a black border around deck image
         pygame.draw.rect(self.screen, BLACK, deck_rect, 2)
         
-    def _render_discard_image (self):
-        """Render the discard pile representation image in bottom left corner"""
-        discard_image = image_loader.load_image("cards/discard_Pile.png", (DISCARD_WIDTH, DISCARD_HEIGHT), make_transparent=False)
-        discard_rect = pygame.Rect(DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT)
-        self.screen.blit(discard_image, discard_rect)
+    def _render_end_turn_button(self):
+        """Render the END TURN button in bottom right corner"""
+        # Try to load END TURN button image, fallback to text button
+        try:
+            end_turn_image = image_loader.load_image("ui/end_Turn_Button.png", (DISCARD_WIDTH, DISCARD_HEIGHT), make_transparent=False)
+            end_turn_rect = pygame.Rect(DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT)
+            self.screen.blit(end_turn_image, end_turn_rect)
+        except:
+            # Fallback to text-based button
+            end_turn_rect = pygame.Rect(DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT)
+            pygame.draw.rect(self.screen, (100, 100, 100), end_turn_rect)  # Gray background
+            pygame.draw.rect(self.screen, WHITE, end_turn_rect, 2)  # White border
+            
+            # Add "END TURN" text
+            button_text = self.font.render("END", True, WHITE)
+            turn_text = self.font.render("TURN", True, WHITE)
+            
+            # Center the text in the button
+            text_x = DISCARD_X + (DISCARD_WIDTH - button_text.get_width()) // 2
+            text_y1 = DISCARD_Y + (DISCARD_HEIGHT // 2) - 20
+            text_y2 = DISCARD_Y + (DISCARD_HEIGHT // 2) + 5
+            
+            self.screen.blit(button_text, (text_x, text_y1))
+            self.screen.blit(turn_text, (text_x, text_y2))
 
-        # Draws a black border around discard image
-        pygame.draw.rect(self.screen, BLACK, discard_rect, 2)
+        # Draw black border around button
+        button_rect = pygame.Rect(DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT)
+        pygame.draw.rect(self.screen, BLACK, button_rect, 2)
 
     def _render_bottom_panel(self):
         """Render the bottom UI panel with background image"""
@@ -209,43 +230,21 @@ class Renderer:
     def _render_deck_counter(self, player):
         """Render the deck card counter"""
         deck_count = player.deck.cards_remaining()
-        discard_count = len(player.discard_pile)
+        hand_count = len(player.hand)
         
-        deck_text = f"Deck: {deck_count}"
-        discard_text = f"Discard: {discard_count}"
+        deck_text = f"Deck: {deck_count} / 10"
+        hand_text = f"Hand: {hand_count} / 4"
         
-        # Position in bottom-right area
+        # Position in top-left area of card box
+        deck_x = 20  # 20 pixels from left edge
+        deck_y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 10  # 10 pixels from top of card box
+        hand_y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 30  # 20 pixels below deck text
+        
         deck_surface = self.font.render(deck_text, True, WHITE)
-        discard_surface = self.small_font.render(discard_text, True, GRAY)
-        
-        deck_x = SCREEN_WIDTH - 120
-        deck_y = SCREEN_HEIGHT - 50
-        discard_y = SCREEN_HEIGHT - 30
+        hand_surface = self.small_font.render(hand_text, True, GRAY)
         
         self.screen.blit(deck_surface, (deck_x, deck_y))
-        self.screen.blit(discard_surface, (deck_x, discard_y))
-    
-    def _render_wrapped_text(self, text, x, y, width, color):
-        """Render text with word wrapping"""
-        words = text.split(' ')
-        lines = []
-        current_line = []
-        
-        for word in words:
-            test_line = ' '.join(current_line + [word])
-            if self.small_font.size(test_line)[0] <= width:
-                current_line.append(word)
-            else:
-                if current_line:
-                    lines.append(' '.join(current_line))
-                current_line = [word]
-        
-        if current_line:
-            lines.append(' '.join(current_line))
-        
-        for i, line in enumerate(lines[:4]):  # Max 4 lines
-            line_surface = self.small_font.render(line, True, color)
-            self.screen.blit(line_surface, (x, y + i * 20))
+        self.screen.blit(hand_surface, (deck_x, hand_y))
     
     def _render_turn_indicator(self, current_turn):
         """Render whose turn it is"""
