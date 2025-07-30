@@ -23,8 +23,8 @@ class Renderer:
         self._render_platform()
         
         # Render characters
-        self._render_character(battle_state.player, PLAYER_COLOR)
-        self._render_character(battle_state.enemy, ENEMY_COLOR)
+        self._render_player(battle_state.player)
+        self._render_slime(battle_state.enemy)
         
         # Render health bars
         self._render_health_bar(battle_state.player, 50, 50)
@@ -73,18 +73,30 @@ class Renderer:
         platform_rect = pygame.Rect(platform_x, PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
         self.screen.blit(platform_image, platform_rect)
     
-    def _render_character(self, character, color):
-        """Render a stick figure character"""
-        # Try to load character sprite with idle animation state, fallback to colored rectangle
-        # Adjust size here - make characters bigger/smaller as needed
-        character_size = (80, 160)  # Width, Height - adjust these values!
-        character_image = image_loader.load_character(character.name, character_size, state="idle")
-        char_rect = character_image.get_rect(center=(character.x, character.y))
-        self.screen.blit(character_image, char_rect)
+    def _render_player(self, player):
+        """Render the player character with specific sizing and positioning"""
+        # Player-specific character size
+        player_size = (100, 240)  
+        player_image = image_loader.load_character(player.name, player_size, state="idle")
+        player_rect = player_image.get_rect(center=(player.x, player.y))
+        self.screen.blit(player_image, player_rect)
         
-        # Render character name
-        name_text = self.font.render(character.name, True, TEXT_COLOR)
-        name_rect = name_text.get_rect(center=(character.x, character.y - 100))  # Adjusted for bigger character
+        # Render player name
+        name_text = self.font.render(player.name, True, TEXT_COLOR)
+        name_rect = name_text.get_rect(center=(player.x, player.y - 140))  # Adjusted for player size
+        self.screen.blit(name_text, name_rect)
+    
+    def _render_slime(self, slime):
+        """Render the slime enemy with specific sizing and positioning"""
+        # Slime-specific character size (different from player)
+        slime_size = (80, 120)  # Smaller than player
+        slime_image = image_loader.load_character("slime", slime_size, state="idle")
+        slime_rect = slime_image.get_rect(center=(slime.x, slime.y))
+        self.screen.blit(slime_image, slime_rect)
+        
+        # Render slime name
+        name_text = self.font.render("Slime", True, TEXT_COLOR)
+        name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):

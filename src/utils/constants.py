@@ -35,7 +35,7 @@ DECK_HEIGHT = 160
 # Character positions
 PLAYER_X = 400
 ENEMY_X = SCREEN_WIDTH - 400
-CHARACTER_Y = PLATFORM_Y - 100
+CHARACTER_Y = PLATFORM_Y - 120
 
 # Card display
 CARD_WIDTH = 120
@@ -64,9 +64,7 @@ CARD_COLOR = (200, 200, 200)
 CARD_BORDER = (255, 255, 255)
 CARD_SELECTED = (255, 255, 0)  # Yellow
 
-# Character colors (placeholder)
-PLAYER_COLOR = (0, 100, 255)  # Blue
-ENEMY_COLOR = (255, 50, 50)   # Red
+
 
 # Text colors
 TEXT_COLOR = WHITE
