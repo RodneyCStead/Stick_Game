@@ -33,6 +33,9 @@ class Renderer:
         # Render bottom panel
         self._render_bottom_panel()
         
+        # Render deck image
+        self._render_deck_image()
+        
         # Render player's hand
         self._render_hand(battle_state.player.hand)
         
@@ -118,6 +121,15 @@ class Renderer:
                 self.screen.blit(buff_surface, (x, buff_y))
                 buff_y += 15
     
+    def _render_deck_image (self):
+        """Render the deck representation image in bottom left corner"""
+        deck_image = image_loader.load_image("cards/Stickittoem_backing.png", (DECK_WIDTH, DECK_HEIGHT), make_transparent=False)
+        deck_rect = pygame.Rect(DECK_X, DECK_Y, DECK_WIDTH, DECK_HEIGHT)
+        self.screen.blit(deck_image, deck_rect)
+        
+        # Draw black border around deck image
+        pygame.draw.rect(self.screen, BLACK, deck_rect, 2)
+    
     def _render_bottom_panel(self):
         """Render the bottom UI panel with background image"""
         panel_rect = pygame.Rect(0, SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT, SCREEN_WIDTH, BOTTOM_PANEL_HEIGHT)
@@ -154,7 +166,7 @@ class Renderer:
         
         # Draw a border around the card
         card_rect = pygame.Rect(x, y, CARD_WIDTH, CARD_HEIGHT)
-        pygame.draw.rect(self.screen, CARD_BORDER, card_rect, 2)
+        pygame.draw.rect(self.screen, BLACK, card_rect, 2)
         
     
     def _render_action_points(self, player):

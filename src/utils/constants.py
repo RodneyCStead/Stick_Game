@@ -20,6 +20,12 @@ BACKGROUND_HEIGHT = PLATFORM_Y  # From top to where platform starts
 BACKGROUND_X = 0
 BACKGROUND_Y = 0  
 
+# Deck position
+DECK_X = 20
+DECK_Y = SCREEN_HEIGHT - 160 - DECK_X
+DECK_WIDTH = 120
+DECK_HEIGHT = 160
+
 # Character positions
 PLAYER_X = 200
 ENEMY_X = SCREEN_WIDTH - 200
@@ -49,7 +55,7 @@ PLATFORM_BORDER = (101, 50, 13)  # Dark brown
 PANEL_COLOR = (50, 50, 50)
 PANEL_BORDER = (100, 100, 100)
 CARD_COLOR = (200, 200, 200)
-CARD_BORDER = (100, 100, 100)
+CARD_BORDER = (255, 255, 255)
 CARD_SELECTED = (255, 255, 0)  # Yellow
 
 # Character colors (placeholder)
