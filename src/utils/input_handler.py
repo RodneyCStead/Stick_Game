@@ -26,7 +26,7 @@ class InputHandler:
                 # Check for double click
                 if current_time - self.last_click_time < self.double_click_threshold:
                     self.mouse_double_clicked = True
-                    self.mouse_clicked = False  # Don't register single click on double click
+                    self.mouse_clicked = False  
                 else:
                     self.mouse_clicked = True
                     self.mouse_double_clicked = False
@@ -35,7 +35,7 @@ class InputHandler:
                 self.mouse_pos = event.pos
         elif event.type == pygame.MOUSEBUTTONUP:
             if event.button == 1:
-                pass  # Keep click state until reset_frame()
+                pass  
         elif event.type == pygame.KEYDOWN:
             self.keys_pressed.add(event.key)
         elif event.type == pygame.KEYUP:
