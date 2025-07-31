@@ -72,13 +72,18 @@ class ImageLoader:
     def load_character(self, character_name, size=(60, 120), state="idle"):
         """Load a character sprite with animation state support"""
         # Convert character name and state to proper format
-        char_name = character_name.lower()
+        # Use special mapping for file names to match actual files
+        if character_name == "Green_Slime":
+            char_name = "green_Slime"  # Match the actual file naming: green_Slime_Idle.png
+        else:
+            char_name = character_name.lower()
         anim_state = state.lower()
         
         # Define custom transparent colors for specific characters
         character_transparent_colors = {
             "player": (0, 0, 255),           
-            "green_slime": (0, 0, 255)  # Blue transparency for green_slime
+            "green_slime": (0, 0, 255),  # Blue transparency for green_slime - same as player
+            "green_Slime": (0, 0, 255)   # Also support the corrected case
         }
         
         # Get the transparent color for this character (default to white)
@@ -89,12 +94,14 @@ class ImageLoader:
         
         # Check if the specific animation state exists
         full_path = os.path.join(self.base_path, image_path)
+        
         if os.path.exists(full_path):
             # Load with character-specific background transparency
             return self.load_image(image_path, size, make_transparent=True, transparent_color=transparent_color)
         
         # Fallback to basic character name (e.g., "player.png")
         fallback_path = f"characters/{char_name}.png"
+        print(f"DEBUG LOADER: Fallback to: {fallback_path}")
         return self.load_image(fallback_path, size, make_transparent=True, transparent_color=transparent_color)
     
     def load_card(self, card_name, size=(120, 160)):

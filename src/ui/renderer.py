@@ -111,13 +111,17 @@ class Renderer:
         # Get current animation state
         animation_state = animation_manager.get_character_state('enemy')
         
-        slime_image = image_loader.load_character("green_Slime", slime_size, state=animation_state)
+        # Use slime.name but convert spaces to underscores for file loading
+        slime_name_for_file = slime.name.replace(" ", "_")
+        
+        slime_image = image_loader.load_character(slime_name_for_file, slime_size, state=animation_state)
         slime_rect = slime_image.get_rect(center=(slime.x, slime.y))
         self.screen.blit(slime_image, slime_rect)
         
         # Render slime name - use the actual enemy name
         name_text = self.font.render(slime.name, True, TEXT_COLOR)
         name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
+        self.screen.blit(name_text, name_rect)
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):

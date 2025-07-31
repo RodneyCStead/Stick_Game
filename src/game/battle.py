@@ -25,6 +25,18 @@ class BattleState:
         self.selected_card_index = None
         self.selected_card_info = None
     
+    def update_character_positions(self):
+        """Update character positions when screen size changes"""
+        from utils.constants import PLAYER_X, CHARACTER_Y, ENEMY_X, ENEMY_Y
+        
+        # Update player position
+        self.player.x = PLAYER_X
+        self.player.y = CHARACTER_Y
+        
+        # Update enemy position
+        self.enemy.x = ENEMY_X
+        self.enemy.y = ENEMY_Y
+    
     def handle_input(self, input_handler):
         """Handle input during battle"""
         # Don't allow input during animations

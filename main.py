@@ -15,8 +15,6 @@ sys.path.insert(0, src_dir)
 
 from utils.constants import *
 from game.engine import GameEngine
-from ui.renderer import Renderer
-from utils.input_handler import InputHandler
 
 async def main():
     """Main game loop optimized for web deployment"""
@@ -24,16 +22,14 @@ async def main():
     pygame.display.set_caption("Stick It To Em - Card Battle Game")
     
     # For web deployment, start with base size and allow scaling
-    screen = pygame.display.set_mode((DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT))
+    screen = pygame.display.set_mode((1200, 800))  # Use hardcoded values
     clock = pygame.time.Clock()
     
-    # Initialize game systems (without viewport for now to avoid import issues)
-    renderer = Renderer(screen)
-    input_handler = InputHandler()
-    game_engine = GameEngine(renderer, input_handler, clock)
+    # Initialize game engine (it creates its own renderer and input handler)
+    game_engine = GameEngine(screen)
     
     print(f"Game initialized for web deployment")
-    print(f"Screen size: {DEFAULT_SCREEN_WIDTH}x{DEFAULT_SCREEN_HEIGHT}")
+    print(f"Screen size: 1200x800")
     
     running = True
     
@@ -50,7 +46,7 @@ async def main():
         game_engine.render()
         
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick(30)  # Use hardcoded FPS
         
         # Critical for web deployment - yield control to browser
         await asyncio.sleep(0)
