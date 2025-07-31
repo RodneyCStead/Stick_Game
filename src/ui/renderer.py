@@ -8,12 +8,20 @@ from utils.image_loader import image_loader
 from utils.animation_manager import animation_manager
 
 class Renderer:
-    def __init__(self, screen):
+    def __init__(self, screen, viewport=None):
         self.screen = screen
+        self.viewport = viewport
         pygame.font.init()
         self.font = pygame.font.Font(None, 24)
         self.title_font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 18)
+    
+    def update_screen(self, new_screen):
+        """Update screen reference and viewport when screen changes"""
+        self.screen = new_screen
+        if self.viewport:
+            self.viewport.screen = new_screen
+            self.viewport.update_viewport()
     
     def render_battle(self, battle_state):
         """Render the entire battle scene"""

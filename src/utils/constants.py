@@ -6,6 +6,10 @@ Screen dimensions, colors, and other game settings
 # Screen dimensions
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
+DEFAULT_SCREEN_WIDTH = 1200  # Base design width for viewport scaling
+DEFAULT_SCREEN_HEIGHT = 800  # Base design height for viewport scaling
+BASE_WIDTH = DEFAULT_SCREEN_WIDTH  # Alias for compatibility
+BASE_HEIGHT = DEFAULT_SCREEN_HEIGHT  # Alias for compatibility
 FPS = 30
 
 # Game layout
