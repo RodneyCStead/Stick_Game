@@ -9,7 +9,10 @@ import os
 class ImageLoader:
     def __init__(self):
         self.image_cache = {}
-        self.base_path = "assets/sprites"
+        # Get the project root directory (go up from src/utils/ to project root)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(current_dir))
+        self.base_path = os.path.join(project_root, "assets", "sprites")
     
     def load_image(self, image_path, size=None, fallback_color=(255, 255, 255), make_transparent=False, transparent_color=(255, 255, 255)):
         """
@@ -41,7 +44,7 @@ class ImageLoader:
             # Convert to a format that supports transparency
             if make_transparent:
                 image = image.convert()
-                image.set_colorkey(transparent_color)  # Make white transparent
+                image.set_colorkey(transparent_color)  
             else:
                 image = image.convert_alpha()
             
@@ -75,9 +78,8 @@ class ImageLoader:
         # Define custom transparent colors for specific characters
         character_transparent_colors = {
             "player": (0, 0, 255),      # Blue transparency for player
-            "goblin": (255, 255, 255),  # White transparency for goblin
-            "orc": (255, 255, 255),     # White transparency for orc
-            "troll": (255, 255, 255),   # White transparency for troll
+            "slime": (255, 255, 255),  # White transparency for slime
+
         }
         
         # Get the transparent color for this character (default to white)
@@ -166,8 +168,10 @@ class ImageLoader:
         if cache_key in self.image_cache:
             return self.image_cache[cache_key]
         
-        # Use different base path for backgrounds
-        full_path = os.path.join("assets", "backgrounds", background_name)
+        # Use absolute path for backgrounds
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.dirname(os.path.dirname(current_dir))
+        full_path = os.path.join(project_root, "assets", "backgrounds", background_name)
         
         try:
             # Try to load the image
