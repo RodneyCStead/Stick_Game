@@ -66,10 +66,35 @@ class ImageLoader:
             self.image_cache[cache_key] = fallback
             return fallback
     
-    def load_character(self, character_name, size=(60, 120)):
-        """Load a character sprite"""
-        image_path = f"characters/{character_name.lower()}.png"
-        return self.load_image(image_path, size)
+    def load_character(self, character_name, size=(60, 120), state="idle"):
+        """Load a character sprite with animation state support"""
+        # Convert character name and state to proper format
+        char_name = character_name.lower()
+        anim_state = state.lower()
+        
+        # Define custom transparent colors for specific characters
+        character_transparent_colors = {
+            "player": (0, 0, 255),      # Blue transparency for player
+            "goblin": (255, 255, 255),  # White transparency for goblin
+            "orc": (255, 255, 255),     # White transparency for orc
+            "troll": (255, 255, 255),   # White transparency for troll
+        }
+        
+        # Get the transparent color for this character (default to white)
+        transparent_color = character_transparent_colors.get(char_name, (255, 255, 255))
+        
+        # Try character with animation state first (e.g., "player_Idle.png")
+        image_path = f"characters/{char_name}_{anim_state.title()}.png"
+        
+        # Check if the specific animation state exists
+        full_path = os.path.join(self.base_path, image_path)
+        if os.path.exists(full_path):
+            # Load with character-specific background transparency
+            return self.load_image(image_path, size, make_transparent=True, transparent_color=transparent_color)
+        
+        # Fallback to basic character name (e.g., "player.png")
+        fallback_path = f"characters/{char_name}.png"
+        return self.load_image(fallback_path, size, make_transparent=True, transparent_color=transparent_color)
     
     def load_card(self, card_name, size=(120, 160)):
         """Load a card image with white background made transparent"""
