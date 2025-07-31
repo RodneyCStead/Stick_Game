@@ -11,33 +11,45 @@ class Player(Character):
         super().__init__("Player", 100, PLAYER_X, CHARACTER_Y)
         
         # Player-specific attributes
-        self.mana = 3
-        self.max_mana = 3
+        self.action_points = 5  # Changed from mana to action points
+        self.max_action_points = 5
         self.deck = Deck()
         self.hand = []
         self.discard_pile = []
         
-        # Draw initial hand
-        self.draw_hand()
+        # Draw initial hand (4 cards)
+        self.draw_hand(4)
     
-    def draw_hand(self, hand_size=5):
-        """Draw cards from deck to hand"""
-        cards_to_draw = min(hand_size - len(self.hand), len(self.deck.cards))
+    def draw_hand(self, target_hand_size=4):
+        """Draw cards from deck to reach target hand size (default 4)"""
+        cards_to_draw = target_hand_size - len(self.hand)
         
         for _ in range(cards_to_draw):
-            if self.deck.cards:
-                card = self.deck.draw_card()
+            card = self.draw_single_card()
+            if card:
                 self.hand.append(card)
+    
+    def draw_single_card(self):
+        """Draw a single card, handling deck reshuffling"""
+        card = self.deck.draw_card()
+        
+        # If deck is empty, try to reshuffle discard pile
+        if card is None and self.discard_pile:
+            print("Deck empty! Reshuffling discard pile...")
+            self.deck.reshuffle_from_discard(self.discard_pile)
+            card = self.deck.draw_card()
+        
+        return card
     
     def can_play_card(self, card):
         """Check if player can play this card"""
-        return self.mana >= card.cost
+        return self.action_points >= card.cost
     
     def play_card(self, card, target=None):
         """Play a card from hand"""
         if self.can_play_card(card):
-            # Pay mana cost
-            self.mana -= card.cost
+            # Pay action point cost
+            self.action_points -= card.cost
             
             # Execute card effect
             card.use(self, target)
@@ -50,17 +62,25 @@ class Player(Character):
             return True
         return False
     
+    def has_action_points(self):
+        """Check if player has any action points left"""
+        return self.action_points > 0
+    
+    def can_afford_any_card(self):
+        """Check if player can afford to play any card in hand"""
+        return any(self.can_play_card(card) for card in self.hand)
+    
     def start_turn(self):
         """Actions at start of player turn"""
         # Update buffs (reduce duration)
         self.update_buffs()
         
-        # Restore mana
-        self.mana = self.max_mana
+        # Restore action points
+        self.action_points = self.max_action_points
         
-        # Draw a card
-        if len(self.hand) < 7:  # Hand size limit
-            self.draw_hand(len(self.hand) + 1)
+        # Draw back to 4 cards if hand is below 4
+        if len(self.hand) < 4:
+            self.draw_hand(4)
     
     def end_turn(self):
         """Actions at end of player turn"""

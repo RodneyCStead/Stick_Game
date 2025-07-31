@@ -2,7 +2,7 @@
 Deck management
 """
 
-from cards.card import AttackCard, HealCard, UtilityCard, BuffCard
+from cards.card import AttackCard, HealCard, UtilityCard, EnhancementCard
 import random
 
 class Deck:
@@ -12,39 +12,46 @@ class Deck:
         self.shuffle()
     
     def _create_starting_deck(self):
-        """Create the player's starting deck with all card types"""
+        """Create the player's starting deck with 10 cards total"""
         
-        # ATTACK CARDS
+        # ATTACK CARDS - Slash
         for _ in range(4):
-            self.cards.append(AttackCard("Strike", 1, 6))
+            self.cards.append(AttackCard("Slash", 2, 8, flavor_text="A swift diagonal cut that never goes out of style."))
         
+        # ATTACK CARDS - Kick 
         for _ in range(2):
-            self.cards.append(AttackCard("Heavy Strike", 2, 12))
+            self.cards.append(AttackCard("Kick", 1, 5, flavor_text="Sometimes the old ways are the best ways."))
         
-        self.cards.append(AttackCard("Power Strike", 3, 18))
+        # UTILITY CARD - Healing Potion (1 card)
+        for _ in range(1):
+            self.cards.append(UtilityCard("Healing", 2, "Heal 10 health", "heal", 10, flavor_text="Tastes terrible but works wonders."))
         
-        # UTILITY CARDS
-        for _ in range(2):
-            self.cards.append(UtilityCard("Shield Block", 1, "Gain 6 armor", "shield", 6))
-        
-        for _ in range(2):
-            self.cards.append(UtilityCard("Healing Potion", 1, "Heal 8 health", "heal", 8))
-        
-        self.cards.append(UtilityCard("Iron Defense", 2, "Gain 12 armor", "shield", 12))
-        
-        # BUFF CARDS
-        self.cards.append(BuffCard("Rage", 2, "Deal +3 damage for 3 turns", "strength", 3, 3))
-        self.cards.append(BuffCard("Focus", 1, "Deal +2 damage for 2 turns", "strength", 2, 2))
+        # ENHANCEMENT CARD - Shield (3 cards)
+        for _ in range(3):
+            self.cards.append(EnhancementCard("Shield", 2, "Gain 8 armor", "shield", 8, flavor_text="Defense is often the best offense."))
     
     def shuffle(self):
         """Shuffle the deck"""
         random.shuffle(self.cards)
     
     def draw_card(self):
-        """Draw a card from the top of the deck"""
-        if self.cards:
-            return self.cards.pop()
-        return None
+        """Draw a card from the top of the deck, reshuffling discard if needed"""
+        if not self.cards:
+            # Deck is empty, need to reshuffle discard pile
+            return None  # Player will handle reshuffling from discard pile
+        return self.cards.pop()
+    
+    def reshuffle_from_discard(self, discard_pile):
+        """Reshuffle discard pile back into deck"""
+        if discard_pile:
+            self.cards.extend(discard_pile)
+            discard_pile.clear()
+            self.shuffle()
+            print(f"Deck reshuffled! Now has {len(self.cards)} cards")
+    
+    def cards_remaining(self):
+        """Get number of cards remaining in deck"""
+        return len(self.cards)
     
     def add_card(self, card):
         """Add a card to the deck"""

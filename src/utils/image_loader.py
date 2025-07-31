@@ -53,7 +53,7 @@ class ImageLoader:
             self.image_cache[cache_key] = image
             return image
             
-        except (pygame.error, FileNotFoundError):
+        except (pygame.error, FileNotFoundError) as e:
             # Create fallback rectangle if image not found
             if size:
                 fallback = pygame.Surface(size)
@@ -66,28 +66,141 @@ class ImageLoader:
             self.image_cache[cache_key] = fallback
             return fallback
     
-    def load_character(self, character_name, size=(60, 120)):
-        """Load a character sprite"""
-        image_path = f"characters/{character_name.lower()}.png"
-        return self.load_image(image_path, size)
+    def load_character(self, character_name, size=(60, 120), state="idle"):
+        """Load a character sprite with animation state support"""
+        # Convert character name and state to proper format
+        char_name = character_name.lower()
+        anim_state = state.lower()
+        
+        # Define custom transparent colors for specific characters
+        character_transparent_colors = {
+            "player": (0, 0, 255),      # Blue transparency for player
+            "goblin": (255, 255, 255),  # White transparency for goblin
+            "orc": (255, 255, 255),     # White transparency for orc
+            "troll": (255, 255, 255),   # White transparency for troll
+        }
+        
+        # Get the transparent color for this character (default to white)
+        transparent_color = character_transparent_colors.get(char_name, (255, 255, 255))
+        
+        # Try character with animation state first (e.g., "player_Idle.png")
+        image_path = f"characters/{char_name}_{anim_state.title()}.png"
+        
+        # Check if the specific animation state exists
+        full_path = os.path.join(self.base_path, image_path)
+        if os.path.exists(full_path):
+            # Load with character-specific background transparency
+            return self.load_image(image_path, size, make_transparent=True, transparent_color=transparent_color)
+        
+        # Fallback to basic character name (e.g., "player.png")
+        fallback_path = f"characters/{char_name}.png"
+        return self.load_image(fallback_path, size, make_transparent=True, transparent_color=transparent_color)
     
     def load_card(self, card_name, size=(120, 160)):
         """Load a card image with white background made transparent"""
-        # Convert card name to filename (remove spaces, lowercase)
-        filename = card_name.lower().replace(" ", "_").replace("'", "")
-        image_path = f"cards/{filename}.png"
-        # Make white background transparent for cards
-        return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
+        # Custom mapping for specific card names to file names
+        card_file_mapping = {
+            "slash": "slash_Attack.png",
+            "kick": "kick_Attack.png",
+            "healing": "healing_Utility.png",
+            "shield": "shield_Enhancement.png"
+        }
+        
+        # Cards that should NOT have white transparency (like shields with white elements)
+        no_transparency_cards = ["shield", "healing"]  # JPGs and cards with white design elements
+        
+        # Get the correct filename
+        card_key = card_name.lower()
+        if card_key in card_file_mapping:
+            filename = card_file_mapping[card_key]
+        else:
+            # Fallback to old naming convention
+            filename = card_name.lower().replace(" ", "_").replace("'", "") + ".png"
+        
+        image_path = f"cards/{filename}"
+        
+        # Check if this card should have transparency or not
+        if card_key in no_transparency_cards:
+            # Don't make white transparent for shield/healing cards
+            return self.load_image(image_path, size, make_transparent=False)
+        else:
+            # Temporarily disable transparency for ALL cards while you work on images
+            return self.load_image(image_path, size, make_transparent=False)
+            # When you're ready for transparency: return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
     
     def load_ui_element(self, element_name, size=None):
-        """Load a UI element"""
-        image_path = f"ui/{element_name.lower()}.png"
-        return self.load_image(image_path, size)
+        """Load a UI element - tries multiple file extensions, NO transparency"""
+        # Try different file extensions
+        extensions = ['.png', '.jpg', '.jpeg']
+        
+        for ext in extensions:
+            try:
+                image_path = f"ui/{element_name.lower()}{ext}"
+                full_path = os.path.join(self.base_path, image_path)
+                
+                if os.path.exists(full_path):
+                    # Load WITHOUT transparency for UI elements
+                    return self.load_image(image_path, size, make_transparent=False)
+            except Exception as e:
+                continue
+        
+        # If no file found, create fallback
+        if size:
+            fallback = pygame.Surface(size)
+        else:
+            fallback = pygame.Surface((100, 100))
+        fallback.fill((64, 64, 64))  # Dark gray fallback
+        return fallback
     
     def load_platform(self, platform_name="battlefield", size=(1000, 200)):
         """Load platform/background image"""
         image_path = f"platform/{platform_name.lower()}.png"
         return self.load_image(image_path, size)
+
+    def load_background(self, background_name, size=None, make_transparent=False, transparent_color=(255, 255, 255)):
+        """Load background image from assets/backgrounds/ folder"""
+        # Create cache key
+        cache_key = f"bg_{background_name}_{size}_{make_transparent}"
+        
+        # Return cached image if available
+        if cache_key in self.image_cache:
+            return self.image_cache[cache_key]
+        
+        # Use different base path for backgrounds
+        full_path = os.path.join("assets", "backgrounds", background_name)
+        
+        try:
+            # Try to load the image
+            image = pygame.image.load(full_path)
+            
+            # Convert to a format that supports transparency
+            if make_transparent:
+                image = image.convert()
+                image.set_colorkey(transparent_color)
+            else:
+                image = image.convert_alpha()
+            
+            # Scale if size provided
+            if size:
+                image = pygame.transform.scale(image, size)
+            
+            # Cache and return
+            self.image_cache[cache_key] = image
+            return image
+            
+        except (pygame.error, FileNotFoundError) as e:
+            print(f"Could not load background: {full_path} - {e}")
+            # Create fallback rectangle if image not found
+            if size:
+                fallback = pygame.Surface(size)
+            else:
+                fallback = pygame.Surface((1200, 400))  # Default background size
+            
+            fallback.fill((135, 206, 235))  # Sky blue fallback
+            
+            # Cache the fallback
+            self.image_cache[cache_key] = fallback
+            return fallback
 
 # Global image loader instance
 image_loader = ImageLoader()
