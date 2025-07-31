@@ -20,17 +20,17 @@ BACKGROUND_HEIGHT = PLATFORM_Y
 BACKGROUND_X = 0
 BACKGROUND_Y = 0  
 
-#Discard pile position
-DISCARD_X = 160
-DISCARD_Y = SCREEN_HEIGHT - 160 - 20  # 20 pixels from bottom
-DISCARD_WIDTH = 120
-DISCARD_HEIGHT = 160
-
 # Deck position
 DECK_X = 20
 DECK_Y = SCREEN_HEIGHT - 160 - DECK_X
 DECK_WIDTH = 120
 DECK_HEIGHT = 160
+
+# END TURN button position (moved to where discard was)
+END_TURN_X = 160
+END_TURN_Y = SCREEN_HEIGHT - 160 - 20  # 20 pixels from bottom
+END_TURN_WIDTH = 120
+END_TURN_HEIGHT = 160
 
 # Character positions
 PLAYER_X = 400
@@ -41,8 +41,37 @@ CHARACTER_Y = PLATFORM_Y - 120
 CARD_WIDTH = 120
 CARD_HEIGHT = 160
 CARD_SPACING = 10
-CARDS_PER_ROW = 5
+CARDS_PER_ROW = 4
 HAND_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 80  
+
+# Card info display area - individual element positioning for each element
+CARD_INFO_WIDTH = 300 
+
+#Card info font sizes
+CARD_NAME_FSIZE = 60      
+CARD_AP_FSIZE = 40        
+CARD_DESC_FSIZE = 30      
+CARD_FLAVOR_FSIZE = 30    
+
+# Card name position
+CARD_NAME_X = SCREEN_WIDTH - 280  
+CARD_NAME_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 10  
+
+# AP cost position
+CARD_AP_X = SCREEN_WIDTH - 280
+CARD_AP_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 70
+
+# Description position
+CARD_DESC_X = SCREEN_WIDTH - 280 
+CARD_DESC_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 100  
+
+# Flavor text position
+CARD_FLAVOR_X = SCREEN_WIDTH - 280  
+CARD_FLAVOR_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 140    
+
+# Deck counter position
+DECK_COUNTER_X = 30  
+DECK_COUNTER_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 20
 
 # Colors
 BLACK = (0, 0, 0)
@@ -52,21 +81,26 @@ GRAY = (128, 128, 128)
 GREEN = (0,255,0)
 DARK_GRAY = (64, 64, 64)
 LIGHT_GRAY = (192, 192, 192)
+YELLOW = (255, 255, 0)
 
 # Platform colors
 PLATFORM_COLOR = (139, 69, 19)  # Brown
 PLATFORM_BORDER = (101, 50, 13)  # Dark brown
 
 # UI colors
-PANEL_COLOR = (50, 50, 50)
-PANEL_BORDER = (100, 100, 100)
-CARD_COLOR = (200, 200, 200)
-CARD_BORDER = (255, 255, 255)
-CARD_SELECTED = (255, 255, 0)  # Yellow
-
-
+PANEL_COLOR = BLACK
+PANEL_BORDER = BLACK
+CARD_COLOR = WHITE
+CARD_BORDER = BLACK
+CARD_SELECTED = YELLOW
 
 # Text colors
 TEXT_COLOR = WHITE
 HEALTH_COLOR = RED    
-AP_COLOR = GREEN          
+AP_COLOR = GREEN 
+
+# Card info text colors
+CARD_NAME_COLOR = BLACK         # Black text for light brown background
+CARD_AP_COLOR = GREEN          
+CARD_DESC_COLOR = BLACK         # Black text for light brown background
+CARD_FLAVOR_COLOR = DARK_GRAY   # Dark gray for flavor text          
