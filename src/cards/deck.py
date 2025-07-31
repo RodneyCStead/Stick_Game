@@ -16,20 +16,20 @@ class Deck:
         
         # ATTACK CARDS - Slash
         for _ in range(4):
-            self.cards.append(AttackCard("Slash", 2, 8, flavor_text="Aim the pointy end at the enemy, and swing it's not that hard."))
+            self.cards.append(AttackCard("Slash", 2, 8, flavor_text="' Aim the pointy end at the enemy and swing. It's not that hard.'"))
 
         # ATTACK CARDS - Kick
         for _ in range(2):
-            self.cards.append(AttackCard("Kick", 1, 5, flavor_text="I bet you were looking for a joke...im sorry but I could not think of anything punty."))
-        
+            self.cards.append(AttackCard("Kick", 1, 5, flavor_text="' I bet you were looking for a joke...I'm sorry but I could not think of anything punny.'"))
+
         # UTILITY CARD - Healing Potion (1 card)
         for _ in range(1):
-            self.cards.append(UtilityCard("Healing", 3, "Heal 10 health", "heal", 10, flavor_text="Introducing the NEW flavor, never done before...RED."))
-        
+            self.cards.append(UtilityCard("Healing", 3, "Heal 10 health", "heal", 10, flavor_text="' Introducing the NEW flavor, never done before...RED.'"))
+
         # ENHANCEMENT CARD - Shield (3 cards)
         for _ in range(3):
-            self.cards.append(EnhancementCard("Shield", 2, "Gain 8 armor", "shield", 8, flavor_text="Git gud scrub."))
-    
+            self.cards.append(EnhancementCard("Shield", 2, "Gain 8 armor", "shield", 8, flavor_text="' Who ever said 'math is for blockers', clearly never heard of a shield.'"))
+
     def shuffle(self):
         """Shuffle the deck"""
         random.shuffle(self.cards)

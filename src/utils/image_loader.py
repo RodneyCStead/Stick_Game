@@ -77,9 +77,8 @@ class ImageLoader:
         
         # Define custom transparent colors for specific characters
         character_transparent_colors = {
-            "player": (0, 0, 255),      # Blue transparency for player
-            "slime": (255, 255, 255),  # White transparency for slime
-
+            "player": (0, 0, 255),           
+            "green_slime": (0, 0, 255)  # Blue transparency for green_slime
         }
         
         # Get the transparent color for this character (default to white)
@@ -99,7 +98,7 @@ class ImageLoader:
         return self.load_image(fallback_path, size, make_transparent=True, transparent_color=transparent_color)
     
     def load_card(self, card_name, size=(120, 160)):
-        """Load a card image with white background made transparent"""
+        
         # Custom mapping for specific card names to file names
         card_file_mapping = {
             "slash": "slash_Attack.png",
@@ -107,10 +106,7 @@ class ImageLoader:
             "healing": "healing_Utility.png",
             "shield": "shield_Enhancement.png"
         }
-        
-        # Cards that should NOT have white transparency (like shields with white elements)
-        no_transparency_cards = ["shield", "healing"]  # JPGs and cards with white design elements
-        
+                
         # Get the correct filename
         card_key = card_name.lower()
         if card_key in card_file_mapping:
@@ -121,14 +117,8 @@ class ImageLoader:
         
         image_path = f"cards/{filename}"
         
-        # Check if this card should have transparency or not
-        if card_key in no_transparency_cards:
-            # Don't make white transparent for shield/healing cards
-            return self.load_image(image_path, size, make_transparent=False)
-        else:
-            # Temporarily disable transparency for ALL cards while you work on images
-            return self.load_image(image_path, size, make_transparent=False)
-            # When you're ready for transparency: return self.load_image(image_path, size, make_transparent=True, transparent_color=(255, 255, 255))
+        # No transparency for cards since they have no backgrounds to remove
+        return self.load_image(image_path, size, make_transparent=False)
     
     def load_ui_element(self, element_name, size=None):
         """Load a UI element - tries multiple file extensions, NO transparency"""

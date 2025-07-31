@@ -2,6 +2,8 @@
 Turn Management System
 """
 
+from utils.animation_manager import animation_manager
+
 class TurnManager:
     def __init__(self, player, enemy):
         self.player = player
@@ -27,6 +29,10 @@ class TurnManager:
     
     def end_player_turn(self):
         """End the player's turn and start enemy turn"""
+        # Don't end turn if animations are playing
+        if animation_manager.is_animation_active():
+            return
+            
         self.player.end_turn()
         self.current_turn = "enemy"
         self.start_enemy_turn()
@@ -46,6 +52,8 @@ class TurnManager:
         self.start_player_turn()
     
     def update(self):
-        """Update turn logic"""
-        # Handle any turn-based timing or animations here
-        pass
+        """Update turn logic - check if animations finished"""
+        # If we're waiting for animations to finish before switching turns
+        if self.current_turn == "enemy" and not animation_manager.is_animation_active():
+            # Animation finished, can proceed with turn logic
+            pass

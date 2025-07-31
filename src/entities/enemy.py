@@ -3,7 +3,7 @@ Enemy Character class
 """
 
 from entities.character import Character
-from utils.constants import ENEMY_X, CHARACTER_Y
+from utils.constants import ENEMY_X, ENEMY_Y
 import random
 
 class Enemy(Character):
@@ -17,7 +17,7 @@ class Enemy(Character):
         }
         
         stats = enemy_stats.get(enemy_type, enemy_stats["Green Slime"])
-        super().__init__(enemy_type, stats["health"], ENEMY_X, CHARACTER_Y)
+        super().__init__(enemy_type, stats["health"], ENEMY_X, ENEMY_Y)
         
         self.enemy_type = enemy_type
         self.flavor_text = stats["flavor_text"]
