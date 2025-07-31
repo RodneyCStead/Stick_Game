@@ -133,11 +133,11 @@ class BattleState:
     
     def _is_end_turn_button_clicked(self, mouse_x, mouse_y):
         """Check if the END TURN button was clicked"""
-        from utils.constants import DISCARD_X, DISCARD_Y, DISCARD_WIDTH, DISCARD_HEIGHT
+        from utils.constants import END_TURN_X, END_TURN_Y, END_TURN_WIDTH, END_TURN_HEIGHT
         
         # Check if click is within the END TURN button area
-        if (DISCARD_X <= mouse_x <= DISCARD_X + DISCARD_WIDTH and 
-            DISCARD_Y <= mouse_y <= DISCARD_Y + DISCARD_HEIGHT):
+        if (END_TURN_X <= mouse_x <= END_TURN_X + END_TURN_WIDTH and 
+            END_TURN_Y <= mouse_y <= END_TURN_Y + END_TURN_HEIGHT):
             return True
         return False
     

@@ -32,7 +32,7 @@ class Enemy(Character):
         if self.enemy_type == "Green Slime":
             
             self.cards = [
-                AttackCard("Glorp", 0, 8, "Powerful acid attack", "This is what I ment by glorp you up.")
+                AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I ment by glorp you up.")
             ]
         
     
