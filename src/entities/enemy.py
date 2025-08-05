@@ -34,8 +34,13 @@ class Enemy(Character):
             self.cards = [
                 AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I ment by glorp you up.")
             ]
-        
-    
+            
+        else: self.enemy_type = "Blue Slime"
+        self.cards = [
+            AttackCard("Blurp", 0, 5, "Like the green slime, it will blurp you."),
+            UtilityCard("Slime Shield", 0, "Gain 3 armor", "The slime hardens its body to reduce damage.", "shield", 3)
+        ]
+
     def take_turn(self, target):
         """Enemy AI - choose and use a card"""
         if self.is_alive and self.cards:
