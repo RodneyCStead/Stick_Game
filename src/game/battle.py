@@ -1,6 +1,6 @@
-"""
-Battle State - Manages turn-based combat
-"""
+# ==============================================
+# Battle State Management
+# ==============================================
 
 from entities.player import Player
 from entities.enemy import Enemy

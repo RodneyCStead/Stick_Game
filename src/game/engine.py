@@ -1,6 +1,6 @@
-"""
-Game Engine - Main game logic and state management
-"""
+# ======================================================
+# Game Engine - Main game loop and state management 
+# ======================================================
 
 import pygame
 from utils.constants import *

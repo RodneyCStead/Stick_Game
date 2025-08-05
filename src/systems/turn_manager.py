@@ -1,6 +1,6 @@
-"""
-Turn Management System
-"""
+# ==============================================
+# Turn Manager - Handles turn-based combat logic    
+# ==============================================
 
 from utils.animation_manager import animation_manager
 

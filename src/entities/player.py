@@ -1,6 +1,6 @@
-"""
-Player Character class
-"""
+# ==============================================
+# Player Character class    
+# ==============================================
 
 from entities.character import Character
 from cards.deck import Deck
@@ -69,9 +69,10 @@ class Player(Character):
     def can_afford_any_card(self):
         """Check if player can afford to play any card in hand"""
         return any(self.can_play_card(card) for card in self.hand)
-    
+
+    # Actions at start of player turn
     def start_turn(self):
-        """Actions at start of player turn"""
+        
         # Update buffs (reduce duration)
         self.update_buffs()
         
@@ -82,6 +83,6 @@ class Player(Character):
         if len(self.hand) < 4:
             self.draw_hand(4)
     
+    # Actions at end of player turn
     def end_turn(self):
-        """Actions at end of player turn"""
         pass
