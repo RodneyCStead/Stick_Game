@@ -8,17 +8,21 @@ import random
 
 class Enemy(Character):
     def __init__(self, enemy_type="Green Slime"):
-        
+        # Expanded enemy stats for multiple enemy types
         enemy_stats = {
             "Green Slime": {
                 "health": 60,
                 "flavor_text": "Don't be fooled by this creature, it WILL Glorp you up."
+            },
+            "Blue Slime": {
+                "health": 70,
+                "flavor_text": "A chillier cousin that packs a wetter punch."
             }
         }
-        
+
         stats = enemy_stats.get(enemy_type, enemy_stats["Green Slime"])
         super().__init__(enemy_type, stats["health"], ENEMY_X, ENEMY_Y)
-        
+
         self.enemy_type = enemy_type
         self.flavor_text = stats["flavor_text"]
         self.cards = []  # Enemy's available cards
@@ -26,20 +30,21 @@ class Enemy(Character):
     
     # Initialize enemy cards based on enemy type
     def _initialize_cards(self):
-        
         from cards.card import AttackCard, UtilityCard
-        
+
         if self.enemy_type == "Green Slime":
-            
             self.cards = [
-                AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I ment by glorp you up.")
+                AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I meant by glorp you up."),
+                UtilityCard("Slime Shield", 0, "Gain 4 armor", "The slime jiggles defensively.", "shield", 4)
             ]
-            
-        else: self.enemy_type = "Blue Slime"
-        self.cards = [
-            AttackCard("Blurp", 0, 10, "Like the green slime, it will blurp you."),
-            UtilityCard("Slime Shield", 0, "Gain 5 armor", "The slime hardens its body to reduce damage.", "shield", 5)
-        ]
+        elif self.enemy_type == "Blue Slime":
+            self.cards = [
+                AttackCard("Blurp", 0, 10, "A damp concussive splash attack."),
+                UtilityCard("Icy Film", 0, "Gain 6 armor", "The slime cools and hardens.", "shield", 6)
+            ]
+        else:
+            # Generic fallback
+            self.cards = [AttackCard("Smack", 0, 5, "A basic enemy attack.")]
 
     def take_turn(self, target):
         """Enemy AI - choose and use a card"""

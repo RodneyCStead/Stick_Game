@@ -32,11 +32,24 @@ class Renderer:
         
         # Render characters
         self._render_player(battle_state.player)
-        self._render_slime(battle_state.enemy)
+        # Render all enemies
+        if hasattr(battle_state, 'enemies'):
+            for enemy in battle_state.get_active_enemies():
+                self._render_slime(enemy)
+        else:
+            self._render_slime(battle_state.enemy)
         
         # Render health bars
         self._render_health_bar(battle_state.player, 50, 50)
-        self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
+        # Render enemy (first / primary) health bar or multiple stacked
+        if hasattr(battle_state, 'enemies') and len(battle_state.enemies) > 1:
+            hx = SCREEN_WIDTH - 250
+            hy = 50
+            for enemy in battle_state.get_active_enemies():
+                self._render_health_bar(enemy, hx, hy)
+                hy += 60  # vertical spacing
+        else:
+            self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
         
         # Render bottom panel
         self._render_bottom_panel()

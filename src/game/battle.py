@@ -9,33 +9,61 @@ from cards.deck import Deck
 from utils.animation_manager import animation_manager
 
 class BattleState:
-    def __init__(self):
-        # Initialize player and enemy
-        self.player = Player()
-        self.enemy = Enemy("Green Slime")
-        
-        # Turn management
-        self.turn_manager = TurnManager(self.player, self.enemy)
-        
-        # Battle state
+    def __init__(self, player=None, enemies=None):
+        """Initialize a battle instance (supports multiple enemies)."""
+        # Player (reuse across waves if provided)
+        self.player = player if player else Player()
+
+        # Enemy list
+        if enemies is None:
+            enemies = [Enemy("Green Slime")]
+        self.enemies = enemies
+
+        # Primary enemy (first alive)
+        self.enemy = self._get_primary_enemy()
+
+        # Turn manager (multi-enemy aware)
+        self.turn_manager = TurnManager(self.player, self.enemy, enemies_list=self.enemies)
+
+        # Battle state flags
         self.battle_over = False
         self.winner = None
-        
-        # Selected card for info display
+
+        # UI selection state
         self.selected_card_index = None
         self.selected_card_info = None
+
+        # Layout enemies
+        self._layout_enemy_positions()
     
     def update_character_positions(self):
         """Update character positions when screen size changes"""
-        from utils.constants import PLAYER_X, CHARACTER_Y, ENEMY_X, ENEMY_Y
-        
-        # Update player position
+        from utils.constants import PLAYER_X, CHARACTER_Y
+        # Update player position (X fixed, Y fixed for now)
         self.player.x = PLAYER_X
         self.player.y = CHARACTER_Y
-        
-        # Update enemy position
-        self.enemy.x = ENEMY_X
-        self.enemy.y = ENEMY_Y
+        # Re-layout enemies (responsive to screen changes)
+        self._layout_enemy_positions()
+
+    def _layout_enemy_positions(self):
+        """Assign x,y positions to all enemies with horizontal spacing."""
+        from utils.constants import ENEMY_X, ENEMY_Y
+        if not self.enemies:
+            return
+        count = len(self.enemies)
+        if count == 1:
+            e = self.enemies[0]
+            e.x = ENEMY_X
+            e.y = ENEMY_Y
+            return
+        # Spacing between enemy centers
+        spacing = 160
+        # Center group around ENEMY_X
+        total_width = (count - 1) * spacing
+        start_x = ENEMY_X - total_width / 2
+        for idx, enemy in enumerate(self.enemies):
+            enemy.x = int(start_x + idx * spacing)
+            enemy.y = ENEMY_Y
     
     def handle_input(self, input_handler):
         """Handle input during battle"""
@@ -74,14 +102,26 @@ class BattleState:
         """Update battle logic"""
         if not self.battle_over:
             self.turn_manager.update()
-            
-            # Check for battle end conditions
+
+            # Update primary enemy reference to first alive
+            self.enemy = self._get_primary_enemy()
+
+            # Battle end conditions
             if self.player.health <= 0:
                 self.battle_over = True
                 self.winner = "enemy"
-            elif self.enemy.health <= 0:
+            elif all(not e.is_alive for e in self.enemies):
                 self.battle_over = True
                 self.winner = "player"
+
+    def _get_primary_enemy(self):
+        for e in getattr(self, 'enemies', []):
+            if e.is_alive:
+                return e
+        return self.enemies[0] if getattr(self, 'enemies', []) else None
+
+    def get_active_enemies(self):
+        return [e for e in self.enemies if e.is_alive]
     
     def _get_clicked_card(self, mouse_x, mouse_y):
         """Determine which card was clicked"""

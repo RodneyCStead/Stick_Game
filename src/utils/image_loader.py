@@ -72,17 +72,25 @@ class ImageLoader:
     def load_character(self, character_name, size=(80, 120), state="idle"):
         """Load a character sprite with animation state support"""
     
-        if character_name == "Green_Slime":
-            char_name = "green_Slime"  
+        # Normalize provided character_name to match actual filename patterns.
+        # Assets currently use mixed case like green_Slime_Idle.png, blue_Slime_Idle.png
+        name_normalized = character_name.replace(" ", "_")
+        if name_normalized in ("Green_Slime", "green_slime"):
+            char_name = "green_Slime"
+        elif name_normalized in ("Blue_Slime", "blue_slime"):
+            char_name = "blue_Slime"
         else:
-            char_name = character_name.lower()
+            # Fallback: lowercase (works if assets are fully lowercase)
+            char_name = name_normalized.lower()
         anim_state = state.lower()
         
         # Define custom transparent colors for specific characters
         character_transparent_colors = {
-            "player": (0, 0, 255),           
-            "green_slime": (0, 0, 255),  
-            "green_Slime": (0, 0, 255)   
+            "player": (0, 0, 255),
+            "green_slime": (0, 0, 255),
+            "green_Slime": (0, 0, 255),
+            "blue_slime": (0, 0, 255),
+            "blue_Slime": (0, 0, 255)
         }
         
         # Get the transparent color for this character (default to white)
