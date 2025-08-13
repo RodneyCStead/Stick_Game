@@ -14,45 +14,84 @@ class AnimationManager:
         """Start animation sequence for a specific card"""
         if card_name.lower() == "slash":
             self._start_slash_animation(caster, target)
-    
+        elif card_name.lower() == "kick":
+            self._start_kick_animation(caster, target)
+
+
+    # Slash animation sequence
     def _start_slash_animation(self, player, enemy):
         """Start the slash animation sequence"""
         current_time = time.time()
         
-        # Define the animation sequence
         animation_sequence = [
             {
                 'character': 'player',
                 'state': 'Slash_1',
                 'start_time': current_time,
-                'duration': 2.0  # 2 seconds
+                'duration': 1.5  
             },
             {
                 'character': 'player', 
                 'state': 'Slash_2',
-                'start_time': current_time + 2.0,
-                'duration': 2.0  # 2 seconds
+                'start_time': current_time + 1.5,
+                'duration': 1.5  
             },
             {
                 'character': 'enemy',
                 'state': 'Slashed', 
-                'start_time': current_time + 4.0,  # When player reaches Slash_2
-                'duration': 1.0  # 1 second
+                'start_time': current_time + 3.0,
+                'duration': 1.5
             },
             {
                 'character': 'both',
                 'state': 'idle',
-                'start_time': current_time + 5.0,  # Return to idle
-                'duration': 0.0  # Permanent until next animation
+                'start_time': current_time + 4.5,  
+                'duration': 0.0  
             }
         ]
         
-        # Store the animation sequence
+        
         self.animation_queue = animation_sequence
         self.current_animations['slash'] = {
             'active': True,
             'start_time': current_time,
-            'total_duration': 5.0
+            'total_duration': 4.5
+        }
+        
+    def _start_kick_animation(self,player,enemy):
+
+        current_time = time.time()
+        
+        animation_sequence = [
+            {
+                'character': 'player',
+                'state': 'Kick_1',
+                'start_time': current_time,
+                'duration': 1.5
+            },
+            {
+                'character': 'player',
+                'state': 'Kick_2',
+                'start_time': current_time + 1.5,
+                'duration': 1.5
+            },{
+                'character': 'enemy',
+                'state': 'Kicked',
+                'start_time': current_time + 3.0,
+                'duration': 1.5
+            },{
+                'character': 'both',
+                'state': 'idle',
+                'start_time': current_time + 4.5,
+                'duration': 0.0
+            }
+        ]
+        
+        self.animation_queue = animation_sequence
+        self.current_animations['kick'] = {
+            'active': True,
+            'start_time': current_time,
+            'total_duration': 4.5
         }
     
     def get_character_state(self, character_type):

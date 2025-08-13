@@ -1,6 +1,4 @@
-"""
-Main Renderer - Handles all game rendering for Stick It To Em
-"""
+
 
 import pygame
 from utils.constants import *
@@ -8,20 +6,18 @@ from utils.image_loader import image_loader
 from utils.animation_manager import animation_manager
 
 class Renderer:
-    def __init__(self, screen, viewport=None):
+    def __init__(self, screen):  # Removed viewport parameter
         self.screen = screen
-        self.viewport = viewport
+        # Removed self.viewport = viewport
         pygame.font.init()
         self.font = pygame.font.Font(None, 24)
         self.title_font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 18)
     
     def update_screen(self, new_screen):
-        """Update screen reference and viewport when screen changes"""
+        """Update screen reference when screen changes"""
         self.screen = new_screen
-        if self.viewport:
-            self.viewport.screen = new_screen
-            self.viewport.update_viewport()
+        # Removed all viewport code
     
     def render_battle(self, battle_state):
         """Render the entire battle scene"""
@@ -89,7 +85,7 @@ class Renderer:
     def _render_player(self, player):
         """Render the player character with specific sizing and positioning"""
         # Player-specific character size
-        player_size = (100, 240)  
+        player_size = (200, 280)  
         
         # Get current animation state
         animation_state = animation_manager.get_character_state('player')
@@ -106,7 +102,7 @@ class Renderer:
     def _render_slime(self, slime):
         """Render the slime enemy with specific sizing and positioning"""
         # Slime-specific character size 
-        slime_size = (140, 160)  # Smaller than player
+        slime_size = (140, 160)  
         
         # Get current animation state
         animation_state = animation_manager.get_character_state('enemy')
@@ -121,7 +117,6 @@ class Renderer:
         # Render slime name - use the actual enemy name
         name_text = self.font.render(slime.name, True, TEXT_COLOR)
         name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
-        self.screen.blit(name_text, name_rect)
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):
@@ -321,7 +316,7 @@ class Renderer:
         
         for i, line in enumerate(lines[:4]):  
             line_surface = font.render(line, True, color)
-            self.screen.blit(line_surface, (x, y + i * 22))  # Increased line spacing for larger fonts
+            self.screen.blit(line_surface, (x, y + i * 22)) 
     
     def _calculate_wrapped_lines(self, text, width, font=None):
         """Calculate how many lines wrapped text will take"""

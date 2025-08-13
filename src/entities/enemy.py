@@ -24,8 +24,8 @@ class Enemy(Character):
         self.cards = []  # Enemy's available cards
         self._initialize_cards()
     
+    # Initialize enemy cards based on enemy type
     def _initialize_cards(self):
-        
         
         from cards.card import AttackCard, UtilityCard
         

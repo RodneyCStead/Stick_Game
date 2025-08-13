@@ -69,12 +69,11 @@ class ImageLoader:
             self.image_cache[cache_key] = fallback
             return fallback
     
-    def load_character(self, character_name, size=(60, 120), state="idle"):
+    def load_character(self, character_name, size=(80, 120), state="idle"):
         """Load a character sprite with animation state support"""
-        # Convert character name and state to proper format
-        # Use special mapping for file names to match actual files
+    
         if character_name == "Green_Slime":
-            char_name = "green_Slime"  # Match the actual file naming: green_Slime_Idle.png
+            char_name = "green_Slime"  
         else:
             char_name = character_name.lower()
         anim_state = state.lower()
@@ -82,8 +81,8 @@ class ImageLoader:
         # Define custom transparent colors for specific characters
         character_transparent_colors = {
             "player": (0, 0, 255),           
-            "green_slime": (0, 0, 255),  # Blue transparency for green_slime - same as player
-            "green_Slime": (0, 0, 255)   # Also support the corrected case
+            "green_slime": (0, 0, 255),  
+            "green_Slime": (0, 0, 255)   
         }
         
         # Get the transparent color for this character (default to white)
@@ -148,7 +147,7 @@ class ImageLoader:
             fallback = pygame.Surface(size)
         else:
             fallback = pygame.Surface((100, 100))
-        fallback.fill((64, 64, 64))  # Dark gray fallback
+        fallback.fill((64, 64, 64))  
         return fallback
     
     def load_platform(self, platform_name="battlefield", size=(1000, 200)):
