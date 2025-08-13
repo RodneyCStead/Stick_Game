@@ -89,6 +89,7 @@ LIGHT_GRAY = (192, 192, 192)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
 
+
 # Platform colors
 PLATFORM_COLOR = (139, 69, 19)  # Brown
 PLATFORM_BORDER = (101, 50, 13)  # Dark brown

@@ -317,6 +317,7 @@ class Renderer:
         for i, line in enumerate(lines[:4]):  
             line_surface = font.render(line, True, color)
             self.screen.blit(line_surface, (x, y + i * 22)) 
+
     
     def _calculate_wrapped_lines(self, text, width, font=None):
         """Calculate how many lines wrapped text will take"""
