@@ -36,10 +36,15 @@ class ImageLoader:
             return self.image_cache[cache_key]
         
         full_path = os.path.join(self.base_path, image_path)
+        debug = os.environ.get("DEBUG_ASSETS") == "1"
+        if debug:
+            print(f"ASSET LOAD attempt image_path={image_path} full_path={full_path}")
         
         try:
             # Try to load the image
             image = pygame.image.load(full_path)
+            if debug:
+                print(f"ASSET LOAD success {image_path} size={image.get_size()}")
             
             # Convert to a format that supports transparency
             if make_transparent:
@@ -67,6 +72,8 @@ class ImageLoader:
             
             # Cache the fallback
             self.image_cache[cache_key] = fallback
+            if debug:
+                print(f"ASSET LOAD miss {image_path} -> fallback. Error={e}")
             return fallback
     
     def load_character(self, character_name, size=(80, 120), state="idle"):

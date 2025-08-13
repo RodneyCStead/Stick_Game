@@ -1,5 +1,3 @@
-
-
 import pygame
 from utils.constants import *
 from utils.image_loader import image_loader
@@ -70,10 +68,20 @@ class Renderer:
         self.screen.blit(background_image, background_rect)
     
     def _render_platform(self):
-        """Render the battle platform"""
-        platform_image = image_loader.load_image("platform/platform_Box.png", (PLATFORM_WIDTH, PLATFORM_HEIGHT), make_transparent=True, transparent_color=(255, 255, 255))
-        
-        # Centers the platform on screen
+        """Render the battle platform with safe fallback"""
+        try:
+            platform_image = image_loader.load_image(
+                "platform/platform_Box.png",
+                (PLATFORM_WIDTH, PLATFORM_HEIGHT),
+                make_transparent=True,
+                transparent_color=(255, 255, 255)
+            )
+        except Exception as e:
+            # Fallback plain surface so a missing asset doesn't crash web build
+            print(f"PLATFORM LOAD FAIL fallback used: {e}")
+            platform_image = pygame.Surface((PLATFORM_WIDTH, PLATFORM_HEIGHT))
+            platform_image.fill((90,90,90))
+            pygame.draw.rect(platform_image, (0,0,0), platform_image.get_rect(), 2)
         platform_x = (SCREEN_WIDTH - PLATFORM_WIDTH) // 2
         platform_rect = pygame.Rect(platform_x, PLATFORM_Y, PLATFORM_WIDTH, PLATFORM_HEIGHT)
         self.screen.blit(platform_image, platform_rect)
