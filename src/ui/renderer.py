@@ -1,21 +1,29 @@
-"""
-Main Renderer - Handles all game rendering for Stick It To Em
-"""
+
 
 import pygame
 from utils.constants import *
 from utils.image_loader import image_loader
+from utils.animation_manager import animation_manager
 
 class Renderer:
-    def __init__(self, screen):
+    def __init__(self, screen):  # Removed viewport parameter
         self.screen = screen
+        # Removed self.viewport = viewport
         pygame.font.init()
         self.font = pygame.font.Font(None, 24)
         self.title_font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 18)
     
+    def update_screen(self, new_screen):
+        """Update screen reference when screen changes"""
+        self.screen = new_screen
+        # Removed all viewport code
+    
     def render_battle(self, battle_state):
         """Render the entire battle scene"""
+        # Update animation system
+        animation_manager.update()
+        
         # Render background (first layer)
         self._render_background()
         
@@ -54,9 +62,6 @@ class Renderer:
         # Render turn indicator
         self._render_turn_indicator(battle_state.get_current_turn())
         
-        # Render enemy intent
-        self._render_enemy_intent(battle_state.enemy)
-        
         # Render battle end screen if needed
         if battle_state.battle_over:
             self._render_battle_end(battle_state.winner)
@@ -80,8 +85,12 @@ class Renderer:
     def _render_player(self, player):
         """Render the player character with specific sizing and positioning"""
         # Player-specific character size
-        player_size = (100, 240)  
-        player_image = image_loader.load_character(player.name, player_size, state="idle")
+        player_size = (200, 280)  
+        
+        # Get current animation state
+        animation_state = animation_manager.get_character_state('player')
+        
+        player_image = image_loader.load_character(player.name, player_size, state=animation_state)
         player_rect = player_image.get_rect(center=(player.x, player.y))
         self.screen.blit(player_image, player_rect)
         
@@ -92,14 +101,21 @@ class Renderer:
     
     def _render_slime(self, slime):
         """Render the slime enemy with specific sizing and positioning"""
-        # Slime-specific character size (different from player)
-        slime_size = (80, 120)  # Smaller than player
-        slime_image = image_loader.load_character("slime", slime_size, state="idle")
+        # Slime-specific character size 
+        slime_size = (140, 160)  
+        
+        # Get current animation state
+        animation_state = animation_manager.get_character_state('enemy')
+        
+        # Use slime.name but convert spaces to underscores for file loading
+        slime_name_for_file = slime.name.replace(" ", "_")
+        
+        slime_image = image_loader.load_character(slime_name_for_file, slime_size, state=animation_state)
         slime_rect = slime_image.get_rect(center=(slime.x, slime.y))
         self.screen.blit(slime_image, slime_rect)
         
-        # Render slime name
-        name_text = self.font.render("Slime", True, TEXT_COLOR)
+        # Render slime name - use the actual enemy name
+        name_text = self.font.render(slime.name, True, TEXT_COLOR)
         name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
         self.screen.blit(name_text, name_rect)
     
@@ -300,7 +316,8 @@ class Renderer:
         
         for i, line in enumerate(lines[:4]):  
             line_surface = font.render(line, True, color)
-            self.screen.blit(line_surface, (x, y + i * 22))  # Increased line spacing for larger fonts
+            self.screen.blit(line_surface, (x, y + i * 22)) 
+
     
     def _calculate_wrapped_lines(self, text, width, font=None):
         """Calculate how many lines wrapped text will take"""
@@ -330,13 +347,6 @@ class Renderer:
         turn_text = f"{current_turn.title()}'s Turn"
         text_surface = self.title_font.render(turn_text, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 30))
-        self.screen.blit(text_surface, text_rect)
-    
-    def _render_enemy_intent(self, enemy):
-        """Render what the enemy plans to do"""
-        intent_text = enemy.get_intent()
-        text_surface = self.font.render(intent_text, True, TEXT_COLOR)
-        text_rect = text_surface.get_rect(center=(enemy.x, enemy.y + 80))
         self.screen.blit(text_surface, text_rect)
     
     def _render_battle_end(self, winner):

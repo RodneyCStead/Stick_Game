@@ -1,14 +1,14 @@
-"""
-Enemy Character class
-"""
+# ==============================================
+# Enemy Character class
+# ==============================================
 
 from entities.character import Character
-from utils.constants import ENEMY_X, CHARACTER_Y
+from utils.constants import ENEMY_X, ENEMY_Y
 import random
 
 class Enemy(Character):
     def __init__(self, enemy_type="Green Slime"):
-        # Enemy stats based on type - focused on Green Slime only
+        
         enemy_stats = {
             "Green Slime": {
                 "health": 60,
@@ -17,16 +17,16 @@ class Enemy(Character):
         }
         
         stats = enemy_stats.get(enemy_type, enemy_stats["Green Slime"])
-        super().__init__(enemy_type, stats["health"], ENEMY_X, CHARACTER_Y)
+        super().__init__(enemy_type, stats["health"], ENEMY_X, ENEMY_Y)
         
         self.enemy_type = enemy_type
         self.flavor_text = stats["flavor_text"]
         self.cards = []  # Enemy's available cards
         self._initialize_cards()
     
+    # Initialize enemy cards based on enemy type
     def _initialize_cards(self):
-        """Initialize the enemy's unique card set based on their type"""
-        # Import here to avoid circular imports
+        
         from cards.card import AttackCard, UtilityCard
         
         if self.enemy_type == "Green Slime":
@@ -34,8 +34,13 @@ class Enemy(Character):
             self.cards = [
                 AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I ment by glorp you up.")
             ]
-        
-    
+            
+        else: self.enemy_type = "Blue Slime"
+        self.cards = [
+            AttackCard("Blurp", 0, 10, "Like the green slime, it will blurp you."),
+            UtilityCard("Slime Shield", 0, "Gain 5 armor", "The slime hardens its body to reduce damage.", "shield", 5)
+        ]
+
     def take_turn(self, target):
         """Enemy AI - choose and use a card"""
         if self.is_alive and self.cards:

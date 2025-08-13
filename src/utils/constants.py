@@ -6,6 +6,10 @@ Screen dimensions, colors, and other game settings
 # Screen dimensions
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
+DEFAULT_SCREEN_WIDTH = 1200  # Base design width for viewport scaling
+DEFAULT_SCREEN_HEIGHT = 800  # Base design height for viewport scaling
+BASE_WIDTH = DEFAULT_SCREEN_WIDTH  # Alias for compatibility
+BASE_HEIGHT = DEFAULT_SCREEN_HEIGHT  # Alias for compatibility
 FPS = 30
 
 # Game layout
@@ -35,7 +39,8 @@ END_TURN_HEIGHT = 160
 # Character positions
 PLAYER_X = 400
 ENEMY_X = SCREEN_WIDTH - 400
-CHARACTER_Y = PLATFORM_Y - 120
+CHARACTER_Y = PLATFORM_Y - 160  
+ENEMY_Y = PLATFORM_Y - 80       
 
 # Card display
 CARD_WIDTH = 120
@@ -45,13 +50,13 @@ CARDS_PER_ROW = 4
 HAND_Y = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT + 80  
 
 # Card info display area - individual element positioning for each element
-CARD_INFO_WIDTH = 300 
+CARD_INFO_WIDTH = 275
 
 #Card info font sizes
 CARD_NAME_FSIZE = 60      
 CARD_AP_FSIZE = 40        
 CARD_DESC_FSIZE = 30      
-CARD_FLAVOR_FSIZE = 30    
+CARD_FLAVOR_FSIZE = 30       
 
 # Card name position
 CARD_NAME_X = SCREEN_WIDTH - 280  
@@ -82,6 +87,8 @@ GREEN = (0,255,0)
 DARK_GRAY = (64, 64, 64)
 LIGHT_GRAY = (192, 192, 192)
 YELLOW = (255, 255, 0)
+BLUE = (0, 0, 255)
+
 
 # Platform colors
 PLATFORM_COLOR = (139, 69, 19)  # Brown

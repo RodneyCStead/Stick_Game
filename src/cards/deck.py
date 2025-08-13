@@ -1,9 +1,18 @@
-"""
-Deck management
-"""
+# ============================================================================
+# STARTER DECK CONFIGURATION
+# ============================================================================
 
-from cards.card import AttackCard, HealCard, UtilityCard, EnhancementCard
+from cards.card import create_card
 import random
+
+
+
+STARTER_DECK_COMPOSITION = {
+    "Slash": 4,     
+    "Kick": 2,       
+    "Healing": 1, 
+    "Shield": 3     
+}
 
 class Deck:
     def __init__(self):
@@ -12,24 +21,11 @@ class Deck:
         self.shuffle()
     
     def _create_starting_deck(self):
-        """Create the player's starting deck with 10 cards total"""
-        
-        # ATTACK CARDS - Slash
-        for _ in range(4):
-            self.cards.append(AttackCard("Slash", 2, 8, flavor_text="Aim the pointy end at the enemy, and swing it's not that hard."))
+        """Create the player's starting deck using the composition defined above"""
+        for card_name, count in STARTER_DECK_COMPOSITION.items():
+            for _ in range(count):
+                self.cards.append(create_card(card_name))
 
-        # ATTACK CARDS - Kick
-        for _ in range(2):
-            self.cards.append(AttackCard("Kick", 1, 5, flavor_text="I bet you were looking for a joke...im sorry but I could not think of anything punty."))
-        
-        # UTILITY CARD - Healing Potion (1 card)
-        for _ in range(1):
-            self.cards.append(UtilityCard("Healing", 3, "Heal 10 health", "heal", 10, flavor_text="Introducing the NEW flavor, never done before...RED."))
-        
-        # ENHANCEMENT CARD - Shield (3 cards)
-        for _ in range(3):
-            self.cards.append(EnhancementCard("Shield", 2, "Gain 8 armor", "shield", 8, flavor_text="Git gud scrub."))
-    
     def shuffle(self):
         """Shuffle the deck"""
         random.shuffle(self.cards)

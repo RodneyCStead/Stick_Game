@@ -1,6 +1,6 @@
-"""
-Game Engine - Main game logic and state management
-"""
+# ======================================================
+# Game Engine - Main game loop and state management 
+# ======================================================
 
 import pygame
 from utils.constants import *
@@ -37,6 +37,19 @@ class GameEngine:
         
         # Reset per-frame input
         self.input_handler.reset_frame()
+    
+    def update_screen(self, new_screen):
+        """Update the screen reference when switching between windowed/fullscreen"""
+        self.screen = new_screen
+        self.renderer.update_screen(new_screen)  # Use the renderer's update method
+        
+        # Update the battle state's renderer reference
+        if hasattr(self.battle_state, 'renderer'):
+            self.battle_state.renderer = self.renderer
+        
+        # Update character positions for new screen size
+        if hasattr(self.battle_state, 'update_character_positions'):
+            self.battle_state.update_character_positions()
     
     def render(self):
         """Render the current game state"""

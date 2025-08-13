@@ -1,11 +1,12 @@
-"""
-Battle State - Manages turn-based combat
-"""
+# ==============================================
+# Battle State Management
+# ==============================================
 
 from entities.player import Player
 from entities.enemy import Enemy
 from systems.turn_manager import TurnManager
 from cards.deck import Deck
+from utils.animation_manager import animation_manager
 
 class BattleState:
     def __init__(self):
@@ -24,8 +25,24 @@ class BattleState:
         self.selected_card_index = None
         self.selected_card_info = None
     
+    def update_character_positions(self):
+        """Update character positions when screen size changes"""
+        from utils.constants import PLAYER_X, CHARACTER_Y, ENEMY_X, ENEMY_Y
+        
+        # Update player position
+        self.player.x = PLAYER_X
+        self.player.y = CHARACTER_Y
+        
+        # Update enemy position
+        self.enemy.x = ENEMY_X
+        self.enemy.y = ENEMY_Y
+    
     def handle_input(self, input_handler):
         """Handle input during battle"""
+        # Don't allow input during animations
+        if animation_manager.is_animation_active():
+            return
+            
         # Handle double clicks first (for card activation)
         if input_handler.is_mouse_double_clicked():
             mouse_x, mouse_y = input_handler.get_mouse_pos()
@@ -120,6 +137,9 @@ class BattleState:
             
             # Play the card
             if self.player.can_play_card(card):
+                # Start animation before playing the card
+                animation_manager.start_card_animation(card.name, self.player, self.enemy)
+                
                 self.player.play_card(card, self.enemy)
                 
                 # Clear selection since card was used
