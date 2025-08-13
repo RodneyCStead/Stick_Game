@@ -11,8 +11,8 @@ CARD_DEFINITIONS = {
     "Slash": {
         "type": "attack",
         "cost": 2,
-        "damage": 8,
-        "description": "Deal 8 damage",
+        "damage": 100,
+        "description": "Deal 10 damage",
         "flavor_text": "' Aim the pointy end at the enemy and swing. It's not that hard.'"
     },
     "Kick": {

@@ -16,7 +16,7 @@ class Enemy(Character):
             },
             "Blue Slime": {
                 "health": 70,
-                "flavor_text": "A chillier cousin that packs a wetter punch."
+                "flavor_text": "The blue may look friendly but it WILL Blurp you, also utilizes the shield inside of it to give its self armor (cheater)."
             }
         }
 
@@ -35,16 +35,12 @@ class Enemy(Character):
         if self.enemy_type == "Green Slime":
             self.cards = [
                 AttackCard("Glorp", 0, 8, "Powerful-ish yucky attack", "This is what I meant by glorp you up."),
-                UtilityCard("Slime Shield", 0, "Gain 4 armor", "The slime jiggles defensively.", "shield", 4)
             ]
         elif self.enemy_type == "Blue Slime":
             self.cards = [
                 AttackCard("Blurp", 0, 10, "A damp concussive splash attack."),
-                UtilityCard("Icy Film", 0, "Gain 6 armor", "The slime cools and hardens.", "shield", 6)
+                UtilityCard("Slime Shield", 0, "Gain 6 armor", "The slime cools and hardens.", "shield", 6)
             ]
-        else:
-            # Generic fallback
-            self.cards = [AttackCard("Smack", 0, 5, "A basic enemy attack.")]
 
     def take_turn(self, target):
         """Enemy AI - choose and use a card"""

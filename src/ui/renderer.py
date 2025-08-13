@@ -6,7 +6,7 @@ from utils.image_loader import image_loader
 from utils.animation_manager import animation_manager
 
 class Renderer:
-    def __init__(self, screen):  # Removed viewport parameter
+    def __init__(self, screen):
         self.screen = screen
         # Removed self.viewport = viewport
         pygame.font.init()
@@ -23,59 +23,42 @@ class Renderer:
         """Render the entire battle scene"""
         # Update animation system
         animation_manager.update()
-        
-        # Render background (first layer)
+
+        # Layered scene
         self._render_background()
-        
-        # Render platform (middle layer)
         self._render_platform()
-        
-        # Render characters
+
+        # Characters
         self._render_player(battle_state.player)
-        # Render all enemies
         if hasattr(battle_state, 'enemies'):
             for enemy in battle_state.get_active_enemies():
-                self._render_slime(enemy)
-        else:
-            self._render_slime(battle_state.enemy)
-        
-        # Render health bars
+                self._render_slime(enemy, battle_state)
+        else:  # fallback single enemy attr
+            self._render_slime(battle_state.enemy, battle_state)
+
+        # Player top-left health bar (keeping for quick glance)
         self._render_health_bar(battle_state.player, 50, 50)
-        # Render enemy (first / primary) health bar or multiple stacked
-        if hasattr(battle_state, 'enemies') and len(battle_state.enemies) > 1:
-            hx = SCREEN_WIDTH - 250
-            hy = 50
-            for enemy in battle_state.get_active_enemies():
-                self._render_health_bar(enemy, hx, hy)
-                hy += 60  # vertical spacing
-        else:
-            self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
-        
-        # Render bottom panel
+
+        # UI foundation
         self._render_bottom_panel()
-        
-        # Render deck image
         self._render_deck_image()
-        
-        # Render end turn button
         self._render_end_turn_button()
-        
-        # Render player's hand
         self._render_hand(battle_state.player.hand, battle_state)
-        
-        # Render player's action points
+
+        # New centered player status bars above hand
+        self._render_player_status_bars(battle_state.player)
+
+        # Other stats & info
         self._render_action_points(battle_state.player)
-        
-        # Render deck counter
         self._render_deck_counter(battle_state.player)
-        
-        # Render card info display
         self._render_card_info_display(battle_state)
-        
-        # Render turn indicator
         self._render_turn_indicator(battle_state.get_current_turn())
-        
-        # Render battle end screen if needed
+
+        # Targeting indicator
+        if getattr(battle_state, 'selected_enemy', None):
+            self._render_target_arrow(battle_state.selected_enemy)
+
+        # Battle end overlay
         if battle_state.battle_over:
             self._render_battle_end(battle_state.winner)
     
@@ -112,24 +95,23 @@ class Renderer:
         name_rect = name_text.get_rect(center=(player.x, player.y - 140))  # Adjusted for player size
         self.screen.blit(name_text, name_rect)
     
-    def _render_slime(self, slime):
-        """Render the slime enemy with specific sizing and positioning"""
-        # Slime-specific character size 
-        slime_size = (140, 160)  
-        
-        # Get current animation state
-        animation_state = animation_manager.get_character_state('enemy')
-        
-        # Use slime.name but convert spaces to underscores for file loading
+    def _render_slime(self, slime, battle_state):
+        """Render the slime enemy with specific sizing and positioning.
+        Only the targeted enemy shows hit animation (Slashed/Kicked). Others stay Idle during attack resolution."""
+        slime_size = (140, 160)
+        base_state = animation_manager.get_character_state('enemy')
+        # Determine if this enemy should display the base_state or idle
+        display_state = base_state
+        if base_state in ("Slashed", "Kicked"):
+            # Only show on targeted enemy
+            if animation_manager.current_enemy_target is not slime:
+                display_state = "Idle"
         slime_name_for_file = slime.name.replace(" ", "_")
-        
-        slime_image = image_loader.load_character(slime_name_for_file, slime_size, state=animation_state)
+        slime_image = image_loader.load_character(slime_name_for_file, slime_size, state=display_state)
         slime_rect = slime_image.get_rect(center=(slime.x, slime.y))
         self.screen.blit(slime_image, slime_rect)
-        
-        # Render slime name - use the actual enemy name
         name_text = self.font.render(slime.name, True, TEXT_COLOR)
-        name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
+        name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))
         self.screen.blit(name_text, name_rect)
     
     def _render_health_bar(self, character, x, y):
@@ -265,46 +247,121 @@ class Renderer:
         ap_x = 200
         ap_y = SCREEN_HEIGHT - 230
         self.screen.blit(text_surface, (ap_x, ap_y))
-    
+
+    # Renders the deck card counter
     def _render_deck_counter(self, player):
-        """Render the deck card counter"""
         deck_count = player.deck.cards_remaining()
-        
         deck_text = f"Deck: {deck_count} / 10"
         
         # Use constants for positioning
         deck_surface = self.font.render(deck_text, True, WHITE)
         
         self.screen.blit(deck_surface, (DECK_COUNTER_X, DECK_COUNTER_Y))
-    
-    def _render_card_info_display(self, battle_state):
-        """Render the card information display with individual positioning for each element"""
-        # Check if we have a selected card to display
-        if battle_state.selected_card_info:
-            card_info = battle_state.selected_card_info
-            
-            # Font sizes for card info
-            card_name_font = pygame.font.Font(None, CARD_NAME_FSIZE)
-            card_ap_font = pygame.font.Font(None, CARD_AP_FSIZE)
-            card_desc_font = pygame.font.Font(None, CARD_DESC_FSIZE)
-            card_flavor_font = pygame.font.Font(None, CARD_FLAVOR_FSIZE)
-            
-            # Card name (at specified position)
-            # Replace self.font with the specific font for each element
-            name_text = card_name_font.render(card_info['name'], True, CARD_NAME_COLOR)
-            self.screen.blit(name_text, (CARD_NAME_X, CARD_NAME_Y))
 
-            # AP cost (at specified position)
-            cost_text = f"AP Cost: {card_info['cost']}"
-            cost_surface = card_ap_font.render(cost_text, True, CARD_AP_COLOR)
+    # Renders the card (or enemy) information panel bottom-right.
+    def _render_card_info_display(self, battle_state):
+        
+        # Priority: card info over enemy info
+        if battle_state.selected_card_info:
+            info = battle_state.selected_card_info
+            name_font = pygame.font.Font(None, CARD_NAME_FSIZE)
+            ap_font = pygame.font.Font(None, CARD_AP_FSIZE)
+            desc_font = pygame.font.Font(None, CARD_DESC_FSIZE)
+            flavor_font = pygame.font.Font(None, CARD_FLAVOR_FSIZE)
+            name_text = name_font.render(info['name'], True, CARD_NAME_COLOR)
+            self.screen.blit(name_text, (CARD_NAME_X, CARD_NAME_Y))
+            cost_text = f"AP Cost: {info['cost']}"
+            cost_surface = ap_font.render(cost_text, True, CARD_AP_COLOR)
             self.screen.blit(cost_surface, (CARD_AP_X, CARD_AP_Y))
+            self._render_wrapped_text(info['description'], CARD_DESC_X, CARD_DESC_Y, CARD_INFO_WIDTH, CARD_DESC_COLOR, desc_font)
+           
+            if info.get('flavor_text'):
+                self._render_wrapped_text(info['flavor_text'], CARD_FLAVOR_X, CARD_FLAVOR_Y, CARD_INFO_WIDTH, CARD_FLAVOR_COLOR, flavor_font)
+        
+        elif getattr(battle_state, 'selected_enemy', None):
+            enemy = battle_state.selected_enemy
+            name_font = pygame.font.Font(None, CARD_NAME_FSIZE)
+            bar_font = pygame.font.Font(None, 28)
+            flavor_font = pygame.font.Font(None, CARD_FLAVOR_FSIZE)
+            name_surface = name_font.render(enemy.name, True, CARD_NAME_COLOR)
+            self.screen.blit(name_surface, (CARD_NAME_X, CARD_NAME_Y))
+            bar_x = CARD_DESC_X
+            bar_y = CARD_AP_Y
+            bar_w = CARD_INFO_WIDTH - 20
+            bar_h = 24
             
-            # Description (wrapped text at specified position)
-            self._render_wrapped_text(card_info['description'], CARD_DESC_X, CARD_DESC_Y, CARD_INFO_WIDTH, CARD_DESC_COLOR, card_desc_font)
+            pygame.draw.rect(self.screen, DARK_GRAY, (bar_x, bar_y, bar_w, bar_h))
+            hp_pct = enemy.get_health_percentage()
+            pygame.draw.rect(self.screen, HEALTH_COLOR, (bar_x, bar_y, int(bar_w * hp_pct), bar_h))
+            pygame.draw.rect(self.screen, BLACK, (bar_x, bar_y, bar_w, bar_h), 2)
+            hp_text = bar_font.render(f"HP {enemy.health}/{enemy.max_health}", True, TEXT_COLOR)
+            self.screen.blit(hp_text, (bar_x + 6, bar_y + 2))
             
-            # Flavor text (wrapped text at specified position)
-            if card_info.get('flavor_text'):
-                self._render_wrapped_text(card_info['flavor_text'], CARD_FLAVOR_X, CARD_FLAVOR_Y, CARD_INFO_WIDTH, CARD_FLAVOR_COLOR, card_flavor_font)
+            armor_y = bar_y + bar_h + 8
+            armor_color_bg = (40, 60, 90)
+            armor_fill_color = (120, 180, 255)
+            pygame.draw.rect(self.screen, armor_color_bg, (bar_x, armor_y, bar_w, bar_h))
+            max_armor = max(enemy.armor, 1)
+            
+            if enemy.armor > 0:
+                fill_w = int(bar_w * (enemy.armor / max_armor))
+                pygame.draw.rect(self.screen, armor_fill_color, (bar_x, armor_y, fill_w, bar_h))
+                
+            pygame.draw.rect(self.screen, BLACK, (bar_x, armor_y, bar_w, bar_h), 2)
+            armor_text = bar_font.render(f"Armor {enemy.armor}", True, TEXT_COLOR)
+            self.screen.blit(armor_text, (bar_x + 6, armor_y + 2))
+            if hasattr(enemy, 'flavor_text') and enemy.flavor_text:
+                self._render_wrapped_text(enemy.flavor_text, CARD_FLAVOR_X, CARD_FLAVOR_Y, CARD_INFO_WIDTH, CARD_FLAVOR_COLOR, flavor_font)
+
+    # Renders a red triangle pointing down to indicate clearly to the player which enemy is selected
+    def _render_target_arrow(self, enemy):
+        
+        arrow_height = 40
+        arrow_width = 60
+        tip_x = enemy.x
+        tip_y = enemy.y - 100  # point just above enemy sprite
+        base_y = tip_y - arrow_height
+        points = [
+            (tip_x, tip_y),  
+            (tip_x - arrow_width//2, base_y),
+            (tip_x + arrow_width//2, base_y)
+        ]
+        pygame.draw.polygon(self.screen, (255,0,0), points)
+        pygame.draw.polygon(self.screen, (0,0,0), points, 4)
+        
+    # Render player status bars
+    def _render_player_status_bars(self, player):
+        bar_w = 250
+        bar_h = 24
+        spacing = 30
+        total_width = bar_w * 2 + spacing
+        start_x = (SCREEN_WIDTH - total_width) // 2
+        # Position so the bottom of the bars sits just above the top border of the card area
+        panel_top = SCREEN_HEIGHT - BOTTOM_PANEL_HEIGHT
+        gap = 4
+        y = panel_top - bar_h - gap
+
+        # Health bar
+        hb_x = start_x
+        pygame.draw.rect(self.screen, DARK_GRAY, (hb_x, y, bar_w, bar_h))
+        hp_pct = player.get_health_percentage()
+        pygame.draw.rect(self.screen, HEALTH_COLOR, (hb_x, y, int(bar_w * hp_pct), bar_h))
+        pygame.draw.rect(self.screen, BLACK, (hb_x, y, bar_w, bar_h), 2)
+        hp_text = self.font.render(f"HP {player.health}/{player.max_health}", True, TEXT_COLOR)
+        self.screen.blit(hp_text, (hb_x + 6, y + 2))
+
+        # Armor bar
+        ab_x = hb_x + bar_w + spacing
+        armor_bg = (40, 60, 90)
+        armor_fill = (120, 180, 255)
+        pygame.draw.rect(self.screen, armor_bg, (ab_x, y, bar_w, bar_h))
+        max_armor = max(player.armor, 1)
+        if player.armor > 0:
+            fill_w = int(bar_w * (player.armor / max_armor))
+            pygame.draw.rect(self.screen, armor_fill, (ab_x, y, fill_w, bar_h))
+        pygame.draw.rect(self.screen, BLACK, (ab_x, y, bar_w, bar_h), 2)
+        armor_text = self.font.render(f"Armor {player.armor}", True, TEXT_COLOR)
+        self.screen.blit(armor_text, (ab_x + 6, y + 2))
 
     def _render_wrapped_text(self, text, x, y, width, color, font=None):
         """Render text with word wrapping"""
