@@ -36,6 +36,10 @@ class Renderer:
         if hasattr(battle_state, 'enemies'):
             for enemy in battle_state.get_active_enemies():
                 self._render_slime(enemy)
+                if getattr(battle_state, 'selected_enemy', None) is enemy:
+                    target_rect = pygame.Rect(0, 0, 148, 168)
+                    target_rect.center = (enemy.x, enemy.y)
+                    pygame.draw.rect(self.screen, YELLOW, target_rect, 4)
         else:
             self._render_slime(battle_state.enemy)
         

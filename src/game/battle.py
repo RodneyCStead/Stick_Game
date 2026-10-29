@@ -7,6 +7,7 @@ from entities.enemy import Enemy
 from systems.turn_manager import TurnManager
 from cards.deck import Deck
 from utils.animation_manager import animation_manager
+import pygame
 
 class BattleState:
     def __init__(self, player=None, enemies=None):
@@ -32,6 +33,7 @@ class BattleState:
         # UI selection state
         self.selected_card_index = None
         self.selected_card_info = None
+        self.selected_enemy = self.enemy
 
         # Layout enemies
         self._layout_enemy_positions()
@@ -70,33 +72,37 @@ class BattleState:
         # Don't allow input during animations
         if animation_manager.is_animation_active():
             return
-            
-        # Handle double clicks first (for card activation)
+
         if input_handler.is_mouse_double_clicked():
             mouse_x, mouse_y = input_handler.get_mouse_pos()
-            
-            # Check if double-clicked on a card
+
+            clicked_enemy = self._get_clicked_enemy(mouse_x, mouse_y)
+            if clicked_enemy is not None:
+                self.selected_enemy = clicked_enemy
+                return
+
             card_index = self._get_clicked_card(mouse_x, mouse_y)
             if card_index is not None and self.turn_manager.is_player_turn():
                 self._activate_card(card_index)
-        
-        # Handle single clicks (for selection and other actions)
+
         elif input_handler.is_mouse_clicked():
             mouse_x, mouse_y = input_handler.get_mouse_pos()
-            
-            # Check if clicked on END TURN button
+
+            clicked_enemy = self._get_clicked_enemy(mouse_x, mouse_y)
+            if clicked_enemy is not None:
+                self.selected_enemy = clicked_enemy
+                return
+
             if self._is_end_turn_button_clicked(mouse_x, mouse_y) and self.turn_manager.is_player_turn():
                 self._end_player_turn()
-            
-            # Check if clicked on a card (for selection/info display)
+                return
+
+            card_index = self._get_clicked_card(mouse_x, mouse_y)
+            if card_index is not None:
+                self._select_card_for_info(card_index)
             else:
-                card_index = self._get_clicked_card(mouse_x, mouse_y)
-                if card_index is not None:
-                    self._select_card_for_info(card_index)
-                else:
-                    # Clicked somewhere else, clear selection
-                    self.selected_card_index = None
-                    self.selected_card_info = None
+                self.selected_card_index = None
+                self.selected_card_info = None
     
     def update(self):
         """Update battle logic"""
@@ -105,6 +111,8 @@ class BattleState:
 
             # Update primary enemy reference to first alive
             self.enemy = self._get_primary_enemy()
+            if self.selected_enemy not in self.get_active_enemies():
+                self.selected_enemy = self.enemy
 
             # Battle end conditions
             if self.player.health <= 0:
@@ -123,6 +131,15 @@ class BattleState:
     def get_active_enemies(self):
         return [e for e in self.enemies if e.is_alive]
     
+    def _get_clicked_enemy(self, mouse_x, mouse_y):
+        """Return the living enemy under the mouse, if any."""
+        for enemy in self.get_active_enemies():
+            rect = pygame.Rect(0, 0, 140, 160)
+            rect.center = (enemy.x, enemy.y)
+            if rect.collidepoint(mouse_x, mouse_y):
+                return enemy
+        return None
+
     def _get_clicked_card(self, mouse_x, mouse_y):
         """Determine which card was clicked"""
         from utils.constants import HAND_Y, CARD_WIDTH, CARD_HEIGHT, CARD_SPACING, SCREEN_WIDTH
@@ -177,10 +194,12 @@ class BattleState:
             
             # Play the card
             if self.player.can_play_card(card):
+                target = self.selected_enemy if self.selected_enemy and self.selected_enemy.is_alive else self.enemy
+
                 # Start animation before playing the card
-                animation_manager.start_card_animation(card.name, self.player, self.enemy)
-                
-                self.player.play_card(card, self.enemy)
+                animation_manager.start_card_animation(card.name, self.player, target)
+
+                self.player.play_card(card, target)
                 
                 # Clear selection since card was used
                 if self.selected_card_index == card_index:
