@@ -1,21 +1,29 @@
-"""
-Main Renderer - Handles all game rendering for Stick It To Em
-"""
+
 
 import pygame
 from utils.constants import *
 from utils.image_loader import image_loader
+from utils.animation_manager import animation_manager
 
 class Renderer:
-    def __init__(self, screen):
+    def __init__(self, screen):  # Removed viewport parameter
         self.screen = screen
+        # Removed self.viewport = viewport
         pygame.font.init()
         self.font = pygame.font.Font(None, 24)
         self.title_font = pygame.font.Font(None, 36)
         self.small_font = pygame.font.Font(None, 18)
     
+    def update_screen(self, new_screen):
+        """Update screen reference when screen changes"""
+        self.screen = new_screen
+        # Removed all viewport code
+    
     def render_battle(self, battle_state):
         """Render the entire battle scene"""
+        # Update animation system
+        animation_manager.update()
+        
         # Render background (first layer)
         self._render_background()
         
@@ -24,12 +32,32 @@ class Renderer:
         
         # Render characters
         self._render_player(battle_state.player)
-        self._render_slime(battle_state.enemy)
+        # Render all enemies
+        if hasattr(battle_state, 'enemies'):
+            for enemy in battle_state.get_active_enemies():
+                self._render_slime(enemy)
+                if getattr(battle_state, 'selected_enemy', None) is enemy:
+                    target_rect = pygame.Rect(0, 0, 148, 168)
+                    target_rect.center = (enemy.x, enemy.y)
+                    pygame.draw.rect(self.screen, YELLOW, target_rect, 4)
+        else:
+            self._render_slime(battle_state.enemy)
         
         # Render health bars
         self._render_health_bar(battle_state.player, 50, 50)
-        self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
+        # Render enemy (first / primary) health bar or multiple stacked
+        if hasattr(battle_state, 'enemies') and len(battle_state.enemies) > 1:
+            hx = SCREEN_WIDTH - 250
+            hy = 50
+            for enemy in battle_state.get_active_enemies():
+                self._render_health_bar(enemy, hx, hy)
+                hy += 60  # vertical spacing
+        else:
+            self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
         
+        # Render selected-enemy details without covering the battle area
+        self._render_selected_enemy_box(battle_state)
+
         # Render bottom panel
         self._render_bottom_panel()
         
@@ -54,9 +82,6 @@ class Renderer:
         # Render turn indicator
         self._render_turn_indicator(battle_state.get_current_turn())
         
-        # Render enemy intent
-        self._render_enemy_intent(battle_state.enemy)
-        
         # Render battle end screen if needed
         if battle_state.battle_over:
             self._render_battle_end(battle_state.winner)
@@ -80,8 +105,12 @@ class Renderer:
     def _render_player(self, player):
         """Render the player character with specific sizing and positioning"""
         # Player-specific character size
-        player_size = (100, 240)  
-        player_image = image_loader.load_character(player.name, player_size, state="idle")
+        player_size = (200, 280)  
+        
+        # Get current animation state
+        animation_state = animation_manager.get_character_state('player')
+        
+        player_image = image_loader.load_character(player.name, player_size, state=animation_state)
         player_rect = player_image.get_rect(center=(player.x, player.y))
         self.screen.blit(player_image, player_rect)
         
@@ -92,17 +121,72 @@ class Renderer:
     
     def _render_slime(self, slime):
         """Render the slime enemy with specific sizing and positioning"""
-        # Slime-specific character size (different from player)
-        slime_size = (80, 120)  # Smaller than player
-        slime_image = image_loader.load_character("slime", slime_size, state="idle")
+        # Slime-specific character size 
+        slime_size = (140, 160)  
+        
+        # Get current animation state
+        animation_state = animation_manager.get_character_state('enemy')
+        
+        # Use slime.name but convert spaces to underscores for file loading
+        slime_name_for_file = slime.name.replace(" ", "_")
+        
+        slime_image = image_loader.load_character(slime_name_for_file, slime_size, state=animation_state)
         slime_rect = slime_image.get_rect(center=(slime.x, slime.y))
         self.screen.blit(slime_image, slime_rect)
         
-        # Render slime name
-        name_text = self.font.render("Slime", True, TEXT_COLOR)
+        # Render slime name - use the actual enemy name
+        name_text = self.font.render(slime.name, True, TEXT_COLOR)
         name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
         self.screen.blit(name_text, name_rect)
     
+    def _render_selected_enemy_box(self, battle_state):
+        """Render details only while the player has selected an enemy."""
+        enemy = getattr(battle_state, "selected_enemy", None)
+        if enemy is None or not enemy.is_alive:
+            return
+
+        box_width = ENEMY_BOX_WIDTH
+        box_height = ENEMY_BOX_HEIGHT
+        box_x = ENEMY_BOX_X
+        box_y = ENEMY_BOX_Y
+        box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
+
+        box_image = image_loader.load_ui_element("enemy_Box", (box_width, box_height))
+        if box_image:
+            self.screen.blit(box_image, box_rect)
+        pygame.draw.rect(self.screen, BLACK, box_rect, 2)
+
+        padding_x = 16
+        content_y = box_y + 14
+
+        name_text = self.font.render(enemy.name, True, WHITE)
+        self.screen.blit(name_text, (box_x + padding_x, content_y))
+
+        health_text = self.small_font.render(
+            f"Health: {enemy.health}/{enemy.max_health}", True, WHITE
+        )
+        self.screen.blit(health_text, (box_x + padding_x, content_y + 38))
+
+        armor_text = self.small_font.render(f"Armor: {enemy.armor}", True, WHITE)
+        self.screen.blit(armor_text, (box_x + padding_x, content_y + 62))
+
+        intent_text = self.small_font.render(f"Intent: {enemy.get_intent()}", True, YELLOW)
+        intent_rect = intent_text.get_rect(
+            left=box_x + padding_x,
+            top=content_y + 86,
+            width=box_width - padding_x * 2,
+        )
+        self.screen.blit(intent_text, intent_rect)
+
+        planned_card = getattr(enemy, "planned_card", None)
+        if planned_card is not None:
+            card_image = image_loader.load_card(planned_card.name, (60, 80))
+            card_rect = card_image.get_rect(
+                right=box_rect.right - 12,
+                top=box_rect.top + 12,
+            )
+            self.screen.blit(card_image, card_rect)
+
     def _render_health_bar(self, character, x, y):
         """Render a health bar and armor for a character"""
         bar_width = 200
@@ -300,7 +384,8 @@ class Renderer:
         
         for i, line in enumerate(lines[:4]):  
             line_surface = font.render(line, True, color)
-            self.screen.blit(line_surface, (x, y + i * 22))  # Increased line spacing for larger fonts
+            self.screen.blit(line_surface, (x, y + i * 22)) 
+
     
     def _calculate_wrapped_lines(self, text, width, font=None):
         """Calculate how many lines wrapped text will take"""
@@ -330,13 +415,6 @@ class Renderer:
         turn_text = f"{current_turn.title()}'s Turn"
         text_surface = self.title_font.render(turn_text, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, 30))
-        self.screen.blit(text_surface, text_rect)
-    
-    def _render_enemy_intent(self, enemy):
-        """Render what the enemy plans to do"""
-        intent_text = enemy.get_intent()
-        text_surface = self.font.render(intent_text, True, TEXT_COLOR)
-        text_rect = text_surface.get_rect(center=(enemy.x, enemy.y + 80))
         self.screen.blit(text_surface, text_rect)
     
     def _render_battle_end(self, winner):
