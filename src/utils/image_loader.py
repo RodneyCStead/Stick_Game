@@ -118,7 +118,10 @@ class ImageLoader:
             "slash": "slash_Attack.png",
             "kick": "kick_Attack.png",
             "healing": "healing_Utility.png",
-            "shield": "shield_Enhancement.png"
+            "shield": "shield_Enhancement.png",
+            "glorp": "glorp_Attack.png",
+            "blorp": "blorp_Attack.png",
+            "slime shield": "slimeshield_Enhancement.png"
         }
                 
         # Get the correct filename
@@ -135,27 +138,30 @@ class ImageLoader:
         return self.load_image(image_path, size, make_transparent=False)
     
     def load_ui_element(self, element_name, size=None):
-        """Load a UI element - tries multiple file extensions, NO transparency"""
-        # Try different file extensions
+        """Load assets/sprites/ui or assets/ui, preserving the requested filename."""
         extensions = ['.png', '.jpg', '.jpeg']
-        
-        for ext in extensions:
-            try:
-                image_path = f"ui/{element_name.lower()}{ext}"
-                full_path = os.path.join(self.base_path, image_path)
-                
+
+        project_root = os.path.dirname(os.path.dirname(self.base_path))
+        search_roots = [
+            (self.base_path, "ui"),
+            (os.path.join(project_root, "assets"), "ui"),
+        ]
+
+        for root, subfolder in search_roots:
+            for ext in extensions:
+                image_path = os.path.join(subfolder, element_name + ext)
+                full_path = os.path.join(root, image_path)
                 if os.path.exists(full_path):
-                    # Load WITHOUT transparency for UI elements
-                    return self.load_image(image_path, size, make_transparent=False)
-            except Exception as e:
-                continue
-        
-        # If no file found, create fallback
+                    image = pygame.image.load(full_path)
+                    if size:
+                        image = pygame.transform.scale(image, size)
+                    return image.convert_alpha()
+
         if size:
             fallback = pygame.Surface(size)
         else:
             fallback = pygame.Surface((100, 100))
-        fallback.fill((64, 64, 64))  
+        fallback.fill((64, 64, 64))
         return fallback
     
     def load_platform(self, platform_name="battlefield", size=(1000, 200)):

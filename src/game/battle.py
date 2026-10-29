@@ -33,7 +33,7 @@ class BattleState:
         # UI selection state
         self.selected_card_index = None
         self.selected_card_info = None
-        self.selected_enemy = self.enemy
+        self.selected_enemy = None
 
         # Layout enemies
         self._layout_enemy_positions()
@@ -112,7 +112,7 @@ class BattleState:
             # Update primary enemy reference to first alive
             self.enemy = self._get_primary_enemy()
             if self.selected_enemy not in self.get_active_enemies():
-                self.selected_enemy = self.enemy
+                self.selected_enemy = None
 
             # Battle end conditions
             if self.player.health <= 0:

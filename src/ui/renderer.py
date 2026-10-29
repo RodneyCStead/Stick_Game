@@ -55,6 +55,9 @@ class Renderer:
         else:
             self._render_health_bar(battle_state.enemy, SCREEN_WIDTH - 250, 50)
         
+        # Render selected-enemy details without covering the battle area
+        self._render_selected_enemy_box(battle_state)
+
         # Render bottom panel
         self._render_bottom_panel()
         
@@ -136,6 +139,54 @@ class Renderer:
         name_rect = name_text.get_rect(center=(slime.x, slime.y - 80))  # Adjusted for slime size
         self.screen.blit(name_text, name_rect)
     
+    def _render_selected_enemy_box(self, battle_state):
+        """Render details only while the player has selected an enemy."""
+        enemy = getattr(battle_state, "selected_enemy", None)
+        if enemy is None or not enemy.is_alive:
+            return
+
+        box_width = ENEMY_BOX_WIDTH
+        box_height = ENEMY_BOX_HEIGHT
+        box_x = ENEMY_BOX_X
+        box_y = ENEMY_BOX_Y
+        box_rect = pygame.Rect(box_x, box_y, box_width, box_height)
+
+        box_image = image_loader.load_ui_element("enemy_Box", (box_width, box_height))
+        if box_image:
+            self.screen.blit(box_image, box_rect)
+        pygame.draw.rect(self.screen, BLACK, box_rect, 2)
+
+        padding_x = 16
+        content_y = box_y + 14
+
+        name_text = self.font.render(enemy.name, True, WHITE)
+        self.screen.blit(name_text, (box_x + padding_x, content_y))
+
+        health_text = self.small_font.render(
+            f"Health: {enemy.health}/{enemy.max_health}", True, WHITE
+        )
+        self.screen.blit(health_text, (box_x + padding_x, content_y + 38))
+
+        armor_text = self.small_font.render(f"Armor: {enemy.armor}", True, WHITE)
+        self.screen.blit(armor_text, (box_x + padding_x, content_y + 62))
+
+        intent_text = self.small_font.render(f"Intent: {enemy.get_intent()}", True, YELLOW)
+        intent_rect = intent_text.get_rect(
+            left=box_x + padding_x,
+            top=content_y + 86,
+            width=box_width - padding_x * 2,
+        )
+        self.screen.blit(intent_text, intent_rect)
+
+        planned_card = getattr(enemy, "planned_card", None)
+        if planned_card is not None:
+            card_image = image_loader.load_card(planned_card.name, (60, 80))
+            card_rect = card_image.get_rect(
+                right=box_rect.right - 12,
+                top=box_rect.top + 12,
+            )
+            self.screen.blit(card_image, card_rect)
+
     def _render_health_bar(self, character, x, y):
         """Render a health bar and armor for a character"""
         bar_width = 200
